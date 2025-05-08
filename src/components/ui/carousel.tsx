@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
@@ -202,9 +203,9 @@ const CarouselPrevious = React.forwardRef<
     <Button
       ref={ref}
       variant={variant}
-      size={size}
+      size={size as "default" | "sm" | "lg"}
       className={cn(
-        "absolute  h-8 w-8 rounded-full",
+        "absolute h-8 w-8 rounded-full",
         orientation === "horizontal"
           ? "-left-12 top-1/2 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -231,7 +232,7 @@ const CarouselNext = React.forwardRef<
     <Button
       ref={ref}
       variant={variant}
-      size={size}
+      size={size as "default" | "sm" | "lg"}
       className={cn(
         "absolute h-8 w-8 rounded-full",
         orientation === "horizontal"
