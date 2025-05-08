@@ -2,14 +2,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { 
-  User, 
-  Settings, 
+  BarChart, 
   Users, 
   ChevronLeft, 
   ChevronRight,
-  BarChart, 
-  FileText,
-  Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -69,10 +65,6 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       <nav className="space-y-1 px-2 py-4">
         <NavItem to="/" icon={BarChart} label="Dashboard" isOpen={isOpen} />
         <NavItem to="/users" icon={Users} label="User Management" isOpen={isOpen} />
-        <NavItem to="/reports" icon={FileText} label="Reports" isOpen={isOpen} />
-        <NavItem to="/notifications" icon={Bell} label="Notifications" isOpen={isOpen} />
-        <NavItem to="/settings" icon={Settings} label="Settings" isOpen={isOpen} />
-        <NavItem to="/profile" icon={User} label="Profile" isOpen={isOpen} />
       </nav>
     </div>
   );
