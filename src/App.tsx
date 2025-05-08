@@ -28,6 +28,16 @@ const App = () => (
               <UserManagement />
             </AppLayout>
           } />
+          <Route path="/sales" element={
+            <AppLayout>
+              <UserManagement />
+            </AppLayout>
+          } />
+          <Route path="/service" element={
+            <AppLayout>
+              <UserManagement />
+            </AppLayout>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
