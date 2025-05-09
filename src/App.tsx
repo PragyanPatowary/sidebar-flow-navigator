@@ -8,10 +8,13 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
+import SalesTable from "./pages/SalesManagement";
+
 
 const queryClient = new QueryClient();
 
 const App = () => (
+
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -30,7 +33,7 @@ const App = () => (
           } />
           <Route path="/sales" element={
             <AppLayout>
-              <UserManagement />
+              <SalesTable/>
             </AppLayout>
           } />
           <Route path="/service" element={
@@ -44,6 +47,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+
 );
 
 export default App;

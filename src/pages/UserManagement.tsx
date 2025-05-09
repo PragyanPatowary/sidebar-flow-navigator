@@ -52,7 +52,7 @@ const initialUsers: UserData[] = [
     name: "Rahul",
     email: "abc@gmail.com",
     status: "Active",
-    phone: "6002691095",
+    phone: "600221111",
     position: "Developer",
   },
   {
