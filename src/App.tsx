@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
 import SalesTable from "./pages/SalesManagement";
+import ServiceEngineer from "./pages/ServiceEngineer";
+import ServiceEngineerManagement from "./pages/ServiceEngineer";
 
 
 const queryClient = new QueryClient();
@@ -38,7 +40,7 @@ const App = () => (
           } />
           <Route path="/service" element={
             <AppLayout>
-              <UserManagement />
+              <ServiceEngineerManagement />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -40,10 +40,9 @@ interface SalesData {
   id: number;
   name: string;
   email: string;
-  salesValue: string;
   status: "Active" | "Inactive";
   phone: string;
-  territory: string;
+  designation: string;
 }
 
 const initialSales: SalesData[] = [
@@ -51,68 +50,62 @@ const initialSales: SalesData[] = [
     id: 1,
     name: "Collins James",
     email: "collins@salesteam.com",
-    salesValue: "₹25,000",
     status: "Active",
     phone: "6002691095",
-    territory: "North",
+    designation: "Trainee Service Engineer",
   },
   {
     id: 2,
     name: "Philip Roberts",
     email: "philip@salesteam.com",
-    salesValue: "₹45,000",
     status: "Active",
     phone: "+65 9308 4744",
-    territory: "South",
+    designation: "Junior Service Engineer",
   },
   {
     id: 3,
     name: "Sarah Johnson",
     email: "sarah@salesteam.com",
-    salesValue: "₹5,000",
     status: "Inactive",
     phone: "+62-896-5554-32",
-    territory: "East",
+    designation: "Field Service Engineer",
   },
   {
     id: 4,
     name: "Michael Chen",
     email: "chen@salesteam.com",
-    salesValue: "₹35,000",
     status: "Active",
     phone: "+62-838-5558-34",
-    territory: "West",
+    designation: "Support Service Engineer",
   },
   {
     id: 5,
     name: "Amanda Floyd",
     email: "amanda@salesteam.com",
-    salesValue: "₹12,500",
     status: "Inactive",
     phone: "+1-555-8701-158",
-    territory: "North",
+    designation: "Field Service Engineer",
   },
   {
     id: 6,
     name: "Cody Fisher",
     email: "fisher@salesteam.com",
-    salesValue: "₹38,200",
+    // salesValue: "₹38,200",
     status: "Inactive",
     phone: "+61480013910",
-    territory: "South",
+    designation: "Field Service Engineer",
   },
   {
     id: 7,
     name: "Theresa Webb",
     email: "theresa@salesteam.com",
-    salesValue: "₹52,000",
     status: "Active",
     phone: "+91 9163337392",
-    territory: "East",
+    designation: "Field Service Engineer",
   },
 ];
 
-const SalesManagement = () => {
+const ServiceEngineer = () => {
   const [sales, setSales] = useState<SalesData[]>(initialSales);
   const [isAddSaleOpen, setIsAddSaleOpen] = useState(false);
   const [isViewSaleOpen, setIsViewSaleOpen] = useState(false);
@@ -122,10 +115,9 @@ const SalesManagement = () => {
   const [newSale, setNewSale] = useState<Omit<SalesData, "id">>({
     name: "",
     email: "",
-    salesValue: "",
     status: "Active",
     phone: "",
-    territory: "North",
+    designation: "Field Service Engineer",
   });
 
   const handleAddSale = () => {
@@ -141,10 +133,9 @@ const SalesManagement = () => {
     setNewSale({
       name: "",
       email: "",
-      salesValue: "",
       status: "Active",
       phone: "",
-      territory: "North",
+      designation: "Field Service Engineer",
     });
     toast.success("Sales representative added successfully");
   };
@@ -185,18 +176,18 @@ const SalesManagement = () => {
   return (
     <div>
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Sales Employee Management</h1>
+        <h1 className="text-3xl font-bold">Service Engineer</h1>
         <p className="text-gray-500">
-          Manage your sales team members and their territories. Add, edit, view or remove sales representatives.
+          Manage your service engineer team members . Add, edit, view or remove service engineer.
         </p>
       </div>
 
       <div className="mt-8 bg-white rounded-lg shadow">
         <div className="p-6 flex justify-between items-center border-b">
-          <h2 className="text-xl font-semibold">Sales Representatives</h2>
+          <h2 className="text-xl font-semibold">Service Engineers</h2>
           <Button className="flex items-center gap-2" onClick={() => setIsAddSaleOpen(true)}>
             <Plus className="h-4 w-4" />
-            Add Sales Rep
+            Add Service Er
           </Button>
         </div>
 
@@ -207,11 +198,10 @@ const SalesManagement = () => {
                 <TableHead className="w-[40px]">
                   <input type="checkbox" className="rounded border-gray-300" />
                 </TableHead>
-                <TableHead>Representative</TableHead>
+                <TableHead>Service Engineers</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Phone</TableHead>
-                <TableHead>Territory</TableHead>
-                <TableHead>Sales Value</TableHead>
+                <TableHead>Designation</TableHead>
                 <TableHead className="w-[60px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -247,19 +237,18 @@ const SalesManagement = () => {
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        sale.territory === "North"
+                        sale.designation === "Field Service Engineer"
                           ? "bg-blue-100 text-blue-800"
-                          : sale.territory === "East"
+                          : sale.designation === "Junior Service Engineer"
                           ? "bg-purple-100 text-purple-800"
-                          : sale.territory === "South"
+                          : sale.designation === "Trainee Service Engineer"
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-green-100 text-green-800"
                       }`}
                     >
-                      {sale.territory}
+                      {sale.designation}
                     </span>
                   </TableCell>
-                  <TableCell>{sale.salesValue}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -331,30 +320,21 @@ const SalesManagement = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="territory">Territory</Label>
+              <Label htmlFor="designation">Designation</Label>
               <Select 
-                value={newSale.territory} 
-                onValueChange={(value) => setNewSale({...newSale, territory: value})}
+                value={newSale.designation} 
+                onValueChange={(value) => setNewSale({...newSale, designation: value})}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select territory" />
+                  <SelectValue placeholder="Select designation" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="North">North</SelectItem>
-                  <SelectItem value="South">South</SelectItem>
-                  <SelectItem value="East">East</SelectItem>
-                  <SelectItem value="West">West</SelectItem>
+                  <SelectItem value="Trainee Service Engineer">Trainee Service Engineer</SelectItem>
+                  <SelectItem value="Field Service Engineer">Field Service Engineer</SelectItem>
+                  <SelectItem value="Junior Service Engineer">Junior Service Engineer</SelectItem>
+                  <SelectItem value="Support Service Engineer">Support Service Engineer</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="salesValue">Sales Value</Label>
-              <Input 
-                id="salesValue" 
-                value={newSale.salesValue} 
-                onChange={(e) => setNewSale({...newSale, salesValue: e.target.value})}
-                placeholder="₹0"
-              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
@@ -407,10 +387,7 @@ const SalesManagement = () => {
                 <span>{currentSale.phone}</span>
                 
                 <span className="font-medium">Territory:</span>
-                <span>{currentSale.territory}</span>
-                
-                <span className="font-medium">Sales Value:</span>
-                <span>{currentSale.salesValue}</span>
+                <span>{currentSale.designation}</span>
                 
                 <span className="font-medium">Status:</span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -466,29 +443,21 @@ const SalesManagement = () => {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-territory">Territory</Label>
+                <Label htmlFor="edit-designation">Designation</Label>
                 <Select 
-                  value={currentSale.territory} 
-                  onValueChange={(value) => setCurrentSale({...currentSale, territory: value})}
+                  value={currentSale.designation} 
+                  onValueChange={(value) => setCurrentSale({...currentSale, designation: value})}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select territory" />
+                    <SelectValue placeholder="Select designation" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="North">North</SelectItem>
-                    <SelectItem value="South">South</SelectItem>
-                    <SelectItem value="East">East</SelectItem>
-                    <SelectItem value="West">West</SelectItem>
+                  <SelectItem value="Trainee Service Engineer">Trainee Service Engineer</SelectItem>
+                  <SelectItem value="Field Service Engineer">Field Service Engineer</SelectItem>
+                  <SelectItem value="Junior Service Engineer">Junior Service Engineer</SelectItem>
+                  <SelectItem value="Support Service Engineer">Support Service Engineer</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-salesValue">Sales Value</Label>
-                <Input 
-                  id="edit-salesValue" 
-                  value={currentSale.salesValue} 
-                  onChange={(e) => setCurrentSale({...currentSale, salesValue: e.target.value})}
-                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-status">Status</Label>
@@ -538,4 +507,4 @@ const SalesManagement = () => {
   );
 };
 
-export default SalesManagement;
+export default ServiceEngineer;

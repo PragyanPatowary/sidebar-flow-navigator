@@ -84,10 +84,10 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
         {isOpen ? (
-          <h1 className="text-xl font-semibold text-sidebar-foreground">Dashboard</h1>
+          <h1 className="text-xl font-semibold text-sidebar-foreground">HR Dashboard</h1>
         ) : (
           <div className="w-full flex justify-center">
-            <span className="text-xl font-bold text-sidebar-foreground">D</span>
+            <span className="text-xl font-bold text-sidebar-foreground">H</span>
           </div>
         )}
         <button 
@@ -124,7 +124,7 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             }
           >
             <TrendingUp className="h-4 w-4 shrink-0" />
-            <span className="ml-2">Sales Management</span>
+            <span className="ml-2">Sales Employee Management</span>
           </NavLink>
           <NavLink
             to="/service"
