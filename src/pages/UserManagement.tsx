@@ -176,7 +176,7 @@ const UserManagement = () => {
   return (
     <div>
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">User Management</h1>
+        <h1 className="text-3xl font-bold">Employee Management</h1>
         <p className="text-gray-500">
           Manage your team members and their access. Add, edit, view or remove users from your team.
         </p>
