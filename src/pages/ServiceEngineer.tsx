@@ -36,7 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface SalesData {
+interface ServiceData {
   id: number;
   name: string;
   email: string;
@@ -45,11 +45,11 @@ interface SalesData {
   designation: string;
 }
 
-const initialSales: SalesData[] = [
+const initialService: ServiceData[] = [
   {
     id: 1,
     name: "Collins James",
-    email: "collins@salesteam.com",
+    email: "collins@serviceteam.com",
     status: "Active",
     phone: "6002691095",
     designation: "Trainee Service Engineer",
@@ -57,7 +57,7 @@ const initialSales: SalesData[] = [
   {
     id: 2,
     name: "Philip Roberts",
-    email: "philip@salesteam.com",
+    email: "philip@serviceteam.com",
     status: "Active",
     phone: "+65 9308 4744",
     designation: "Junior Service Engineer",
@@ -65,7 +65,7 @@ const initialSales: SalesData[] = [
   {
     id: 3,
     name: "Sarah Johnson",
-    email: "sarah@salesteam.com",
+    email: "sarah@serviceteam.com",
     status: "Inactive",
     phone: "+62-896-5554-32",
     designation: "Field Service Engineer",
@@ -73,7 +73,7 @@ const initialSales: SalesData[] = [
   {
     id: 4,
     name: "Michael Chen",
-    email: "chen@salesteam.com",
+    email: "chen@serviceteam.com",
     status: "Active",
     phone: "+62-838-5558-34",
     designation: "Support Service Engineer",
@@ -81,7 +81,7 @@ const initialSales: SalesData[] = [
   {
     id: 5,
     name: "Amanda Floyd",
-    email: "amanda@salesteam.com",
+    email: "amanda@serviceteam.com",
     status: "Inactive",
     phone: "+1-555-8701-158",
     designation: "Field Service Engineer",
@@ -89,8 +89,7 @@ const initialSales: SalesData[] = [
   {
     id: 6,
     name: "Cody Fisher",
-    email: "fisher@salesteam.com",
-    // salesValue: "₹38,200",
+    email: "fisher@serviceteam.com",
     status: "Inactive",
     phone: "+61480013910",
     designation: "Field Service Engineer",
@@ -98,7 +97,7 @@ const initialSales: SalesData[] = [
   {
     id: 7,
     name: "Theresa Webb",
-    email: "theresa@salesteam.com",
+    email: "theresa@serviceteam.com",
     status: "Active",
     phone: "+91 9163337392",
     designation: "Field Service Engineer",
@@ -106,13 +105,13 @@ const initialSales: SalesData[] = [
 ];
 
 const ServiceEngineer = () => {
-  const [sales, setSales] = useState<SalesData[]>(initialSales);
-  const [isAddSaleOpen, setIsAddSaleOpen] = useState(false);
-  const [isViewSaleOpen, setIsViewSaleOpen] = useState(false);
-  const [isEditSaleOpen, setIsEditSaleOpen] = useState(false);
+  const [service, setService] = useState<ServiceData[]>(initialService);
+  const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
+  const [isViewServiceOpen, setIsViewServiceOpen] = useState(false);
+  const [isEditServiceOpen, setIsEditServiceOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [currentSale, setCurrentSale] = useState<SalesData | null>(null);
-  const [newSale, setNewSale] = useState<Omit<SalesData, "id">>({
+  const [currentService, setCurrentService] = useState<ServiceData | null>(null);
+  const [newService, setNewService] = useState<Omit<ServiceData, "id">>({
     name: "",
     email: "",
     status: "Active",
@@ -120,56 +119,56 @@ const ServiceEngineer = () => {
     designation: "Field Service Engineer",
   });
 
-  const handleAddSale = () => {
-    if (!newSale.name || !newSale.email || !newSale.phone) {
+  const handleAddService = () => {
+    if (!newService.name || !newService.email || !newService.phone) {
       toast.error("Please fill in all required fields");
       return;
     }
     
-    const id = Math.max(0, ...sales.map(sale => sale.id)) + 1;
-    const saleToAdd = { ...newSale, id };
-    setSales([...sales, saleToAdd]);
-    setIsAddSaleOpen(false);
-    setNewSale({
+    const id = Math.max(0, ...service.map(services => services.id)) + 1;
+    const ServiceToAdd = { ...newService, id };
+    setService([...service, ServiceToAdd]);
+    setIsAddServiceOpen(false);
+    setNewService({
       name: "",
       email: "",
       status: "Active",
       phone: "",
       designation: "Field Service Engineer",
     });
-    toast.success("Sales representative added successfully");
+    toast.success("Service Engineer added successfully");
   };
 
-  const handleUpdateSale = () => {
-    if (!currentSale) return;
+  const handleUpdateService = () => {
+    if (!currentService) return;
     
-    setSales(sales.map(sale => 
-      sale.id === currentSale.id ? currentSale : sale
+    setService(service.map(services => 
+      services.id === currentService.id ? currentService : services
     ));
-    setIsEditSaleOpen(false);
-    toast.success("Sales representative updated successfully");
+    setIsEditServiceOpen(false);
+    toast.success("Services representative updated successfully");
   };
 
-  const handleDeleteSale = () => {
-    if (!currentSale) return;
+  const handleDeleteService = () => {
+    if (!currentService) return;
     
-    setSales(sales.filter(sale => sale.id !== currentSale.id));
+    setService(service.filter(services => services.id !== currentService.id));
     setIsDeleteDialogOpen(false);
-    toast.success("Sales representative deleted successfully");
+    toast.success("Services representative deleted successfully");
   };
 
-  const openViewSale = (sale: SalesData) => {
-    setCurrentSale(sale);
-    setIsViewSaleOpen(true);
+  const openViewService = (services: ServiceData) => {
+    setCurrentService(services);
+    setIsViewServiceOpen(true);
   };
 
-  const openEditSale = (sale: SalesData) => {
-    setCurrentSale(sale);
-    setIsEditSaleOpen(true);
+  const openEditService = (services: ServiceData) => {
+    setCurrentService(services);
+    setIsEditServiceOpen(true);
   };
 
-  const openDeleteDialog = (sale: SalesData) => {
-    setCurrentSale(sale);
+  const openDeleteDialog = (services: ServiceData) => {
+    setCurrentService(services);
     setIsDeleteDialogOpen(true);
   };
 
@@ -185,7 +184,7 @@ const ServiceEngineer = () => {
       <div className="mt-8 bg-white rounded-lg shadow">
         <div className="p-6 flex justify-between items-center border-b">
           <h2 className="text-xl font-semibold">Service Engineers</h2>
-          <Button className="flex items-center gap-2" onClick={() => setIsAddSaleOpen(true)}>
+          <Button className="flex items-center gap-2" onClick={() => setIsAddServiceOpen(true)}>
             <Plus className="h-4 w-4" />
             Add Service Er
           </Button>
@@ -206,47 +205,47 @@ const ServiceEngineer = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sales.map((sale) => (
-                <TableRow key={sale.id}>
+              {service.map((services) => (
+                <TableRow key={services.id}>
                   <TableCell>
                     <input type="checkbox" className="rounded border-gray-300" />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold">
-                        {sale.name.charAt(0)}
+                        {services.name.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-medium">{sale.name}</div>
-                        <div className="text-sm text-gray-500">{sale.email}</div>
+                        <div className="font-medium">{services.name}</div>
+                        <div className="text-sm text-gray-500">{services.email}</div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        sale.status === "Active"
+                        services.status === "Active"
                           ? "bg-green-100 text-green-800"
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {sale.status}
+                      {services.status}
                     </span>
                   </TableCell>
-                  <TableCell>{sale.phone}</TableCell>
+                  <TableCell>{services.phone}</TableCell>
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        sale.designation === "Field Service Engineer"
+                        services.designation === "Field Service Engineer"
                           ? "bg-blue-100 text-blue-800"
-                          : sale.designation === "Junior Service Engineer"
+                          : services.designation === "Junior Service Engineer"
                           ? "bg-purple-100 text-purple-800"
-                          : sale.designation === "Trainee Service Engineer"
+                          : services.designation === "Trainee Service Engineer"
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-green-100 text-green-800"
                       }`}
                     >
-                      {sale.designation}
+                      {services.designation}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -259,16 +258,16 @@ const ServiceEngineer = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => openViewSale(sale)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => openViewService(services)} className="cursor-pointer">
                           <Eye className="mr-2 h-4 w-4" />
                           <span>View Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => openEditSale(sale)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => openEditService(services)} className="cursor-pointer">
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => openDeleteDialog(sale)} 
+                          onClick={() => openDeleteDialog(services)} 
                           className="cursor-pointer text-red-600 focus:text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -284,13 +283,13 @@ const ServiceEngineer = () => {
         </div>
       </div>
 
-      {/* Add Sales Rep Dialog */}
-      <Dialog open={isAddSaleOpen} onOpenChange={setIsAddSaleOpen}>
+      {/* Add Services Rep Dialog */}
+      <Dialog open={isAddServiceOpen} onOpenChange={setIsAddServiceOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Sales Representative</DialogTitle>
+            <DialogTitle>Add New Service Engineer</DialogTitle>
             <DialogDescription>
-              Add a new team member to your sales organization.
+              Add a new team member to your service organization.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -298,8 +297,8 @@ const ServiceEngineer = () => {
               <Label htmlFor="name">Name</Label>
               <Input 
                 id="name" 
-                value={newSale.name} 
-                onChange={(e) => setNewSale({...newSale, name: e.target.value})}
+                value={newService.name} 
+                onChange={(e) => setNewService({...newService, name: e.target.value})}
               />
             </div>
             <div className="grid gap-2">
@@ -307,23 +306,23 @@ const ServiceEngineer = () => {
               <Input 
                 id="email" 
                 type="email" 
-                value={newSale.email} 
-                onChange={(e) => setNewSale({...newSale, email: e.target.value})}
+                value={newService.email} 
+                onChange={(e) => setNewService({...newService, email: e.target.value})}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="phone">Phone</Label>
               <Input 
                 id="phone" 
-                value={newSale.phone} 
-                onChange={(e) => setNewSale({...newSale, phone: e.target.value})}
+                value={newService.phone} 
+                onChange={(e) => setNewService({...newService, phone: e.target.value})}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="designation">Designation</Label>
               <Select 
-                value={newSale.designation} 
-                onValueChange={(value) => setNewSale({...newSale, designation: value})}
+                value={newService.designation} 
+                onValueChange={(value) => setNewService({...newService, designation: value})}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select designation" />
@@ -339,8 +338,8 @@ const ServiceEngineer = () => {
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
               <Select 
-                value={newSale.status} 
-                onValueChange={(value: "Active" | "Inactive") => setNewSale({...newSale, status: value})}
+                value={newService.status} 
+                onValueChange={(value: "Active" | "Inactive") => setNewService({...newService, status: value})}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
@@ -353,76 +352,76 @@ const ServiceEngineer = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddSaleOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddSale}>Add Representative</Button>
+            <Button variant="outline" onClick={() => setIsAddServiceOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddService}>Add Representative</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* View Sales Rep Dialog */}
-      <Dialog open={isViewSaleOpen} onOpenChange={setIsViewSaleOpen}>
+      {/* View Services Rep Dialog */}
+      <Dialog open={isViewServiceOpen} onOpenChange={setIsViewServiceOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Sales Representative Profile</DialogTitle>
+            <DialogTitle>Services Representative Profile</DialogTitle>
             <DialogDescription>
               Representative details and information.
             </DialogDescription>
           </DialogHeader>
-          {currentSale && (
+          {currentService && (
             <div className="space-y-4">
               <div className="flex items-center justify-center py-4">
                 <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-2xl font-semibold">
-                  {currentSale.name.charAt(0)}
+                  {currentService.name.charAt(0)}
                 </div>
               </div>
               
               <div className="grid grid-cols-[120px_1fr] gap-2">
                 <span className="font-medium">Name:</span>
-                <span>{currentSale.name}</span>
+                <span>{currentService.name}</span>
                 
                 <span className="font-medium">Email:</span>
-                <span>{currentSale.email}</span>
+                <span>{currentService.email}</span>
                 
                 <span className="font-medium">Phone:</span>
-                <span>{currentSale.phone}</span>
+                <span>{currentService.phone}</span>
                 
                 <span className="font-medium">Territory:</span>
-                <span>{currentSale.designation}</span>
+                <span>{currentService.designation}</span>
                 
                 <span className="font-medium">Status:</span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  currentSale.status === "Active"
+                  currentService.status === "Active"
                     ? "bg-green-100 text-green-800"
                     : "bg-gray-100 text-gray-800"
                 }`}>
-                  {currentSale.status}
+                  {currentService.status}
                 </span>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button onClick={() => setIsViewSaleOpen(false)}>Close</Button>
+            <Button onClick={() => setIsViewServiceOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Sales Rep Dialog */}
-      <Dialog open={isEditSaleOpen} onOpenChange={setIsEditSaleOpen}>
+      {/* Edit Services Rep Dialog */}
+      <Dialog open={isEditServiceOpen} onOpenChange={setIsEditServiceOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Sales Representative</DialogTitle>
+            <DialogTitle>Edit Services Representative</DialogTitle>
             <DialogDescription>
               Update representative information.
             </DialogDescription>
           </DialogHeader>
-          {currentSale && (
+          {currentService && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="edit-name">Name</Label>
                 <Input 
                   id="edit-name" 
-                  value={currentSale.name} 
-                  onChange={(e) => setCurrentSale({...currentSale, name: e.target.value})}
+                  value={currentService.name} 
+                  onChange={(e) => setCurrentService({...currentService, name: e.target.value})}
                 />
               </div>
               <div className="grid gap-2">
@@ -430,23 +429,23 @@ const ServiceEngineer = () => {
                 <Input 
                   id="edit-email" 
                   type="email" 
-                  value={currentSale.email} 
-                  onChange={(e) => setCurrentSale({...currentSale, email: e.target.value})}
+                  value={currentService.email} 
+                  onChange={(e) => setCurrentService({...currentService, email: e.target.value})}
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-phone">Phone</Label>
                 <Input 
                   id="edit-phone" 
-                  value={currentSale.phone} 
-                  onChange={(e) => setCurrentSale({...currentSale, phone: e.target.value})}
+                  value={currentService.phone} 
+                  onChange={(e) => setCurrentService({...currentService, phone: e.target.value})}
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-designation">Designation</Label>
                 <Select 
-                  value={currentSale.designation} 
-                  onValueChange={(value) => setCurrentSale({...currentSale, designation: value})}
+                  value={currentService.designation} 
+                  onValueChange={(value) => setCurrentService({...currentService, designation: value})}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select designation" />
@@ -462,8 +461,8 @@ const ServiceEngineer = () => {
               <div className="grid gap-2">
                 <Label htmlFor="edit-status">Status</Label>
                 <Select 
-                  value={currentSale.status} 
-                  onValueChange={(value: "Active" | "Inactive") => setCurrentSale({...currentSale, status: value})}
+                  value={currentService.status} 
+                  onValueChange={(value: "Active" | "Inactive") => setCurrentService({...currentService, status: value})}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -477,8 +476,8 @@ const ServiceEngineer = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditSaleOpen(false)}>Cancel</Button>
-            <Button onClick={handleUpdateSale}>Update Representative</Button>
+            <Button variant="outline" onClick={() => setIsEditServiceOpen(false)}>Cancel</Button>
+            <Button onClick={handleUpdateService}>Update Representative</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -487,19 +486,19 @@ const ServiceEngineer = () => {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Sales Representative</DialogTitle>
+            <DialogTitle>Delete Services Representative</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete this representative? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          {currentSale && (
+          {currentService && (
             <div className="py-4">
-              <p>You are about to delete sales representative <span className="font-medium">{currentSale.name}</span>.</p>
+              <p>You are about to delete Services representative <span className="font-medium">{currentService.name}</span>.</p>
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteSale}>Delete</Button>
+            <Button variant="destructive" onClick={handleDeleteService}>Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
