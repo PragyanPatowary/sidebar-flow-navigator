@@ -5,7 +5,9 @@ import {
   BarChart, 
   ChevronLeft, 
   ChevronRight,
-  Box
+  Box,
+  Building,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +67,8 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       <nav className="space-y-1 px-2 py-4">
         <NavItem to="/" icon={BarChart} label="Dashboard" isOpen={isOpen} />
         <NavItem to="/products" icon={Box} label="Products" isOpen={isOpen} />
+        <NavItem to="/companies" icon={Building} label="Companies" isOpen={isOpen} />
+        <NavItem to="/employees" icon={Users} label="Employees" isOpen={isOpen} />
       </nav>
     </div>
   );
