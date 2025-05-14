@@ -6,17 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import Index from "./pages/Index";
-import UserManagement from "./pages/UserManagement";
+import ProductManagement from "./pages/ProductManagement";
 import NotFound from "./pages/NotFound";
-import SalesTable from "./pages/SalesManagement";
-import ServiceEngineer from "./pages/ServiceEngineer";
-import ServiceEngineerManagement from "./pages/ServiceEngineer";
-
 
 const queryClient = new QueryClient();
 
 const App = () => (
-
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -28,19 +23,9 @@ const App = () => (
               <Index />
             </AppLayout>
           } />
-          <Route path="/users" element={
+          <Route path="/products" element={
             <AppLayout>
-              <UserManagement />
-            </AppLayout>
-          } />
-          <Route path="/sales" element={
-            <AppLayout>
-              <SalesTable/>
-            </AppLayout>
-          } />
-          <Route path="/service" element={
-            <AppLayout>
-              <ServiceEngineerManagement />
+              <ProductManagement />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -49,7 +34,6 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-
 );
 
 export default App;
