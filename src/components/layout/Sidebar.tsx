@@ -48,10 +48,10 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
         {isOpen ? (
-          <h1 className="text-xl font-semibold text-sidebar-foreground">HR Dashboard</h1>
+          <h1 className="text-xl font-semibold text-sidebar-foreground">Dritu Enterprise</h1>
         ) : (
           <div className="w-full flex justify-center">
-            <span className="text-xl font-bold text-sidebar-foreground">H</span>
+            <span className="text-xl font-bold text-sidebar-foreground">D</span>
           </div>
         )}
         <button 

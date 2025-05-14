@@ -211,9 +211,6 @@ const ProductManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[40px]">
-                  <input type="checkbox" className="rounded border-gray-300" />
-                </TableHead>
                 <TableHead>Product Name</TableHead>
                 <TableHead>Make</TableHead>
                 <TableHead>Model</TableHead>
@@ -227,9 +224,6 @@ const ProductManagement = () => {
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell>
-                    <input type="checkbox" className="rounded border-gray-300" />
-                  </TableCell>
                   <TableCell>
                     <div className="font-medium">{product.name}</div>
                   </TableCell>
