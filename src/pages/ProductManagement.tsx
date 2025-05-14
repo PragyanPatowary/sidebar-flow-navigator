@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2, Eye, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
@@ -77,8 +76,10 @@ const initialProducts: ProductData[] = [
   },
 ];
 
+const STORAGE_KEY = "dritu-enterprise-products";
+
 const ProductManagement = () => {
-  const [products, setProducts] = useState<ProductData[]>(initialProducts);
+  const [products, setProducts] = useState<ProductData[]>([]);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isViewProductOpen, setIsViewProductOpen] = useState(false);
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
@@ -92,6 +93,23 @@ const ProductManagement = () => {
     hsnCode: "",
     price: 0,
   });
+
+  // Load products from localStorage on component mount
+  useEffect(() => {
+    const storedProducts = localStorage.getItem(STORAGE_KEY);
+    if (storedProducts) {
+      setProducts(JSON.parse(storedProducts));
+    } else {
+      // If no products in localStorage, use initial products and save them
+      setProducts(initialProducts);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialProducts));
+    }
+  }, []);
+
+  // Update localStorage whenever products change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  }, [products]);
 
   // Calculate GST and total price based on product price
   const calculatePrices = (price: number) => {
@@ -135,7 +153,8 @@ const ProductManagement = () => {
       totalPrice
     };
     
-    setProducts([...products, productToAdd]);
+    const updatedProducts = [...products, productToAdd];
+    setProducts(updatedProducts);
     setIsAddProductOpen(false);
     setNewProduct({
       name: "",
@@ -151,9 +170,11 @@ const ProductManagement = () => {
   const handleUpdateProduct = () => {
     if (!currentProduct) return;
     
-    setProducts(products.map(product => 
+    const updatedProducts = products.map(product => 
       product.id === currentProduct.id ? currentProduct : product
-    ));
+    );
+    
+    setProducts(updatedProducts);
     setIsEditProductOpen(false);
     toast.success("Product updated successfully");
   };
@@ -161,7 +182,8 @@ const ProductManagement = () => {
   const handleDeleteProduct = () => {
     if (!currentProduct) return;
     
-    setProducts(products.filter(product => product.id !== currentProduct.id));
+    const updatedProducts = products.filter(product => product.id !== currentProduct.id);
+    setProducts(updatedProducts);
     setIsDeleteDialogOpen(false);
     toast.success("Product deleted successfully");
   };
