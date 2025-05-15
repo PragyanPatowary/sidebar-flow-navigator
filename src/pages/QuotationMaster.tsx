@@ -769,7 +769,7 @@ const QuotationMaster = () => {
 
       {/* View Quotation Dialog */}
       <Dialog open={isViewQuotationOpen} onOpenChange={setIsViewQuotationOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Quotation Details</DialogTitle>
             <DialogDescription>
@@ -811,7 +811,7 @@ const QuotationMaster = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Product</TableHead>
-                        <TableHead>Specification</TableHead>
+                        <TableHead className="w-1/3">Specification</TableHead>
                         <TableHead className="text-right">Unit Price</TableHead>
                         <TableHead className="text-right">Qty</TableHead>
                         <TableHead className="text-right">GST</TableHead>
@@ -825,7 +825,9 @@ const QuotationMaster = () => {
                             <div className="font-medium">{product.name}</div>
                             <div className="text-xs text-gray-500">{product.make} {product.model}</div>
                           </TableCell>
-                          <TableCell>{product.specification}</TableCell>
+                          <TableCell className="max-w-xs">
+                            <div className="break-words whitespace-pre-wrap">{product.specification}</div>
+                          </TableCell>
                           <TableCell className="text-right">{formatCurrency(product.price / product.quantity)}</TableCell>
                           <TableCell className="text-right">{product.quantity}</TableCell>
                           <TableCell className="text-right">{formatCurrency(product.gst)}</TableCell>
@@ -835,16 +837,19 @@ const QuotationMaster = () => {
                     </TableBody>
                     <TableFooter>
                       <TableRow>
-                        <TableCell colSpan={4}>Subtotal</TableCell>
+                        <TableCell colSpan={4}></TableCell>
+                        <TableCell className="text-right"><strong>Subtotal:</strong></TableCell>
                         <TableCell className="text-right">{formatCurrency(currentQuotation.gstTotal)}</TableCell>
                         <TableCell className="text-right">{formatCurrency(currentQuotation.subtotal)}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell colSpan={4}>GST Total</TableCell>
+                        <TableCell colSpan={4}></TableCell>
+                        <TableCell className="text-right"><strong>GST:</strong></TableCell>
                         <TableCell colSpan={2} className="text-right">{formatCurrency(currentQuotation.gstTotal)}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell colSpan={4}>Grand Total</TableCell>
+                        <TableCell colSpan={4}></TableCell>
+                        <TableCell className="text-right"><strong>Grand Total:</strong></TableCell>
                         <TableCell colSpan={2} className="text-right font-bold">{formatCurrency(currentQuotation.grandTotal)}</TableCell>
                       </TableRow>
                     </TableFooter>
@@ -892,7 +897,7 @@ const QuotationMaster = () => {
 
       {/* Print Preview Dialog */}
       <Dialog open={isPrintPreviewOpen} onOpenChange={setIsPrintPreviewOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Print Preview</DialogTitle>
             <DialogDescription>
@@ -917,9 +922,10 @@ const QuotationMaster = () => {
                         .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
                         .logo { font-size: 24px; font-weight: bold; }
                         .quotation-info { margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; }
+                        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; word-wrap: break-word; }
                         th { background-color: #f5f5f5; }
+                        .description-cell { width: 35%; }
                         .text-right { text-align: right; }
                         .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
                         .terms { margin-top: 20px; }
@@ -951,12 +957,12 @@ const QuotationMaster = () => {
                       <table>
                         <thead>
                           <tr>
-                            <th>Product</th>
-                            <th>Description</th>
-                            <th class="text-right">Price (₹)</th>
-                            <th class="text-right">Qty</th>
-                            <th class="text-right">GST (₹)</th>
-                            <th class="text-right">Total (₹)</th>
+                            <th width="25%">Product</th>
+                            <th width="35%" class="description-cell">Description</th>
+                            <th class="text-right" width="10%">Price (₹)</th>
+                            <th class="text-right" width="8%">Qty</th>
+                            <th class="text-right" width="10%">GST (₹)</th>
+                            <th class="text-right" width="12%">Total (₹)</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -966,7 +972,7 @@ const QuotationMaster = () => {
                                 <strong>${product.name}</strong><br/>
                                 <small>${product.make} ${product.model}</small>
                               </td>
-                              <td>${product.specification}</td>
+                              <td style="word-wrap: break-word; white-space: normal;">${product.specification}</td>
                               <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.price / product.quantity)}</td>
                               <td class="text-right">${product.quantity}</td>
                               <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.gst)}</td>
