@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Eye, MoreVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, MoreVertical, Search, SortAsc, SortDesc } from "lucide-react";
 import { toast } from "sonner";
 import {
   Table,
@@ -28,13 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ProductData {
   id: number;
@@ -45,11 +40,9 @@ interface ProductData {
   hsnCode: string;
   price: number;
   gst: number;
+  gstRate: number;
   totalPrice: number;
 }
-
-// GST rate is fixed at 18%
-const GST_RATE = 18;
 
 const initialProducts: ProductData[] = [
   {
@@ -61,6 +54,7 @@ const initialProducts: ProductData[] = [
     hsnCode: "8471300",
     price: 85000,
     gst: 15300,
+    gstRate: 18,
     totalPrice: 100300,
   },
   {
@@ -72,6 +66,7 @@ const initialProducts: ProductData[] = [
     hsnCode: "8517120",
     price: 90000,
     gst: 16200,
+    gstRate: 18,
     totalPrice: 106200,
   },
 ];
@@ -85,7 +80,7 @@ const ProductManagement = () => {
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<ProductData | null>(null);
-  const [newProduct, setNewProduct] = useState<Omit<ProductData, "id" | "gst" | "totalPrice">>({
+  const [newProduct, setNewProduct] = useState<Omit<ProductData, "id" | "gst" | "totalPrice" | "gstRate">>({
     name: "",
     make: "",
     model: "",
@@ -93,6 +88,10 @@ const ProductManagement = () => {
     hsnCode: "",
     price: 0,
   });
+  const [gstRate, setGstRate] = useState(18);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<keyof ProductData | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -111,18 +110,19 @@ const ProductManagement = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
   }, [products]);
 
-  // Calculate GST and total price based on product price
-  const calculatePrices = (price: number) => {
-    const gstAmount = (price * GST_RATE) / 100;
+  // Calculate GST and total price based on product price and GST rate
+  const calculatePrices = (price: number, rate: number) => {
+    const gstAmount = (price * rate) / 100;
     const totalPrice = price + gstAmount;
     return { gst: gstAmount, totalPrice };
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const price = parseFloat(e.target.value) || 0;
-    const { gst, totalPrice } = calculatePrices(price);
+    const rate = currentProduct ? currentProduct.gstRate : gstRate;
     
     if (currentProduct) {
+      const { gst, totalPrice } = calculatePrices(price, rate);
       setCurrentProduct({
         ...currentProduct,
         price,
@@ -137,6 +137,22 @@ const ProductManagement = () => {
     }
   };
 
+  const handleGstRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rate = parseFloat(e.target.value) || 0;
+    
+    if (currentProduct) {
+      const { gst, totalPrice } = calculatePrices(currentProduct.price, rate);
+      setCurrentProduct({
+        ...currentProduct,
+        gstRate: rate,
+        gst,
+        totalPrice,
+      });
+    } else {
+      setGstRate(rate);
+    }
+  };
+
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.make || !newProduct.model || !newProduct.hsnCode) {
       toast.error("Please fill in all required fields");
@@ -144,12 +160,13 @@ const ProductManagement = () => {
     }
     
     const id = Math.max(0, ...products.map(product => product.id)) + 1;
-    const { gst, totalPrice } = calculatePrices(newProduct.price);
+    const { gst, totalPrice } = calculatePrices(newProduct.price, gstRate);
     
     const productToAdd = { 
       ...newProduct, 
       id,
       gst,
+      gstRate,
       totalPrice
     };
     
@@ -164,6 +181,7 @@ const ProductManagement = () => {
       hsnCode: "",
       price: 0,
     });
+    setGstRate(18);
     toast.success("Product added successfully");
   };
 
@@ -203,6 +221,20 @@ const ProductManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleSort = (field: keyof ProductData) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const getSortIcon = (field: keyof ProductData) => {
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? <SortAsc className="h-4 w-4 ml-1" /> : <SortDesc className="h-4 w-4 ml-1" />;
+  };
+
   // Format price to Indian Rupees format
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -210,6 +242,36 @@ const ProductManagement = () => {
       currency: 'INR'
     }).format(price);
   };
+
+  // Filter and sort products based on search term and sort settings
+  const filteredProducts = products
+    .filter(product => 
+      searchTerm === "" ||
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.hsnCode.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (!sortField) return 0;
+      
+      const fieldA = a[sortField];
+      const fieldB = b[sortField];
+      
+      if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+        return sortDirection === "asc" 
+          ? fieldA.localeCompare(fieldB) 
+          : fieldB.localeCompare(fieldA);
+      }
+      
+      if (typeof fieldA === 'number' && typeof fieldB === 'number') {
+        return sortDirection === "asc" 
+          ? fieldA - fieldB 
+          : fieldB - fieldA;
+      }
+      
+      return 0;
+    });
 
   return (
     <div>
@@ -223,29 +285,58 @@ const ProductManagement = () => {
       <div className="mt-8 bg-white rounded-lg shadow">
         <div className="p-6 flex justify-between items-center border-b">
           <h2 className="text-xl font-semibold">Product Catalog</h2>
-          <Button className="flex items-center gap-2" onClick={() => setIsAddProductOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Add Product
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                placeholder="Search products..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 w-[250px]" 
+              />
+            </div>
+            <Button className="flex items-center gap-2" onClick={() => setIsAddProductOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Add Product
+            </Button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Make</TableHead>
-                <TableHead>Model</TableHead>
+                <TableHead className="w-[50px]">S.No.</TableHead>
+                <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Product Name {getSortIcon('name')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('make')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Make {getSortIcon('make')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('model')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Model {getSortIcon('model')}
+                  </div>
+                </TableHead>
                 <TableHead>HSN Code</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>GST (18%)</TableHead>
+                <TableHead onClick={() => handleSort('price')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Price {getSortIcon('price')}
+                  </div>
+                </TableHead>
+                <TableHead>GST</TableHead>
                 <TableHead>Total Price</TableHead>
                 <TableHead className="w-[60px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <TableRow key={product.id}>
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>
                     <div className="font-medium">{product.name}</div>
                   </TableCell>
@@ -253,7 +344,7 @@ const ProductManagement = () => {
                   <TableCell>{product.model}</TableCell>
                   <TableCell>{product.hsnCode}</TableCell>
                   <TableCell>{formatPrice(product.price)}</TableCell>
-                  <TableCell>{formatPrice(product.gst)}</TableCell>
+                  <TableCell>{formatPrice(product.gst)} ({product.gstRate}%)</TableCell>
                   <TableCell>{formatPrice(product.totalPrice)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -326,10 +417,11 @@ const ProductManagement = () => {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="specification">Specifications</Label>
-              <Input 
+              <Textarea 
                 id="specification" 
                 value={newProduct.specification} 
                 onChange={(e) => setNewProduct({...newProduct, specification: e.target.value})}
+                className="min-h-[100px] resize-y"
               />
             </div>
             <div className="grid gap-2">
@@ -349,17 +441,26 @@ const ProductManagement = () => {
                 onChange={handlePriceChange}
               />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="gstRate">GST Rate (%)*</Label>
+              <Input 
+                id="gstRate" 
+                type="number" 
+                value={gstRate || ''} 
+                onChange={handleGstRateChange}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>GST (18%)</Label>
+                <Label>GST Amount</Label>
                 <div className="mt-2 text-sm font-medium">
-                  {formatPrice(calculatePrices(newProduct.price).gst)}
+                  {formatPrice(calculatePrices(newProduct.price, gstRate).gst)}
                 </div>
               </div>
               <div>
                 <Label>Total Price</Label>
                 <div className="mt-2 text-sm font-medium">
-                  {formatPrice(calculatePrices(newProduct.price).totalPrice)}
+                  {formatPrice(calculatePrices(newProduct.price, gstRate).totalPrice)}
                 </div>
               </div>
             </div>
@@ -393,7 +494,7 @@ const ProductManagement = () => {
                 <span>{currentProduct.model}</span>
                 
                 <span className="font-medium">Specifications:</span>
-                <span>{currentProduct.specification}</span>
+                <div className="whitespace-pre-wrap break-words">{currentProduct.specification}</div>
                 
                 <span className="font-medium">HSN Code:</span>
                 <span>{currentProduct.hsnCode}</span>
@@ -401,7 +502,10 @@ const ProductManagement = () => {
                 <span className="font-medium">Price:</span>
                 <span>{formatPrice(currentProduct.price)}</span>
                 
-                <span className="font-medium">GST (18%):</span>
+                <span className="font-medium">GST Rate:</span>
+                <span>{currentProduct.gstRate}%</span>
+                
+                <span className="font-medium">GST Amount:</span>
                 <span>{formatPrice(currentProduct.gst)}</span>
                 
                 <span className="font-medium">Total Price:</span>
@@ -452,10 +556,11 @@ const ProductManagement = () => {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-specification">Specifications</Label>
-                <Input 
+                <Textarea 
                   id="edit-specification" 
                   value={currentProduct.specification} 
                   onChange={(e) => setCurrentProduct({...currentProduct, specification: e.target.value})}
+                  className="min-h-[100px] resize-y"
                 />
               </div>
               <div className="grid gap-2">
@@ -475,9 +580,18 @@ const ProductManagement = () => {
                   onChange={handlePriceChange}
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-gstRate">GST Rate (%)</Label>
+                <Input 
+                  id="edit-gstRate" 
+                  type="number" 
+                  value={currentProduct.gstRate || ''} 
+                  onChange={handleGstRateChange}
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>GST (18%)</Label>
+                  <Label>GST Amount</Label>
                   <div className="mt-2 text-sm font-medium">
                     {formatPrice(currentProduct.gst)}
                   </div>

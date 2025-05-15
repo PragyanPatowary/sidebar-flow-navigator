@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { 
   BarChart, 
@@ -7,7 +7,9 @@ import {
   ChevronRight,
   Box,
   Building,
-  Users
+  Users,
+  FileText,
+  Scroll
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -69,6 +71,8 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         <NavItem to="/products" icon={Box} label="Products" isOpen={isOpen} />
         <NavItem to="/companies" icon={Building} label="Companies" isOpen={isOpen} />
         <NavItem to="/employees" icon={Users} label="Employees" isOpen={isOpen} />
+        <NavItem to="/clients" icon={FileText} label="Client Master" isOpen={isOpen} />
+        <NavItem to="/quotations" icon={Scroll} label="Quotation Master" isOpen={isOpen} />
       </nav>
     </div>
   );

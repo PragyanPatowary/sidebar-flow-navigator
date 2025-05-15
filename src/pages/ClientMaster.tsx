@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Eye, MoreVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, MoreVertical, Search, SortAsc, SortDesc } from "lucide-react";
 import { toast } from "sonner";
 import {
   Table,
@@ -37,91 +37,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 
 interface ClientData {
   id: number;
   institution: string;
   department: string;
-  drProfile: "PhD Holder" | "Doctor" | "Teacher" | "Professor";
-  jobRole: "Decision Maker" | "User" | "Influencer" | "Director";
+  profile: string;
+  role: string;
   name: string;
   phone: string;
   email: string;
-  message: string;
-  createdAt: string;
+  notes: string;
 }
 
-const drProfileOptions = ["PhD Holder", "Doctor", "Teacher", "Professor"] as const;
-const jobRoleOptions = ["Decision Maker", "User", "Influencer", "Director"] as const;
-
-const initialClients: ClientData[] = [
-  {
-    id: 1,
-    institution: "City Hospital",
-    department: "Radiology",
-    drProfile: "Doctor",
-    jobRole: "Decision Maker",
-    name: "Dr. Rahul Sharma",
-    phone: "9876543210",
-    email: "rahul.sharma@cityhospital.com",
-    message: "Interested in advanced imaging equipment",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    institution: "National University",
-    department: "Physics",
-    drProfile: "Professor",
-    jobRole: "Influencer",
-    name: "Prof. Anjali Verma",
-    phone: "8765432109",
-    email: "a.verma@nationaluniv.edu",
-    message: "Looking for laboratory equipment for research",
-    createdAt: new Date().toISOString(),
-  },
-];
-
-// Sample institution and department data (in a real app, this might come from an API)
-const institutions = [
-  "City Hospital",
-  "National University",
-  "Regional Medical Center",
-  "Tech Institute",
-  "Research Foundation"
-];
-
-const departmentsByInstitution: Record<string, string[]> = {
-  "City Hospital": ["Radiology", "Cardiology", "Neurology", "Oncology", "Pediatrics"],
-  "National University": ["Physics", "Chemistry", "Biology", "Computer Science", "Engineering"],
-  "Regional Medical Center": ["Emergency", "Surgery", "Internal Medicine", "Psychiatry", "Orthopedics"],
-  "Tech Institute": ["IT Department", "Electronics", "Biotechnology", "Robotics"],
-  "Research Foundation": ["Clinical Research", "Data Science", "Pharmaceutical Research", "Genetics"]
-};
+// Define constants for drop downs
+const PROFILES = ["PhD Holder", "Doctor", "Teacher", "Professor"];
+const ROLES = ["Decision Maker", "User", "Influencer", "Director"];
 
 const STORAGE_KEY = "dritu-enterprise-clients";
 
 const ClientMaster = () => {
-  const { toast } = useToast();
   const [clients, setClients] = useState<ClientData[]>([]);
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [isViewClientOpen, setIsViewClientOpen] = useState(false);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentClient, setCurrentClient] = useState<ClientData | null>(null);
-  
-  const [newClient, setNewClient] = useState<Omit<ClientData, "id" | "createdAt">>({
+  const [newClient, setNewClient] = useState<Omit<ClientData, "id">>({
     institution: "",
     department: "",
-    drProfile: "Doctor",
-    jobRole: "Decision Maker",
+    profile: PROFILES[0],
+    role: ROLES[0],
     name: "",
     phone: "",
     email: "",
-    message: "",
+    notes: "",
   });
-  
-  const [availableDepartments, setAvailableDepartments] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<keyof ClientData | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Load clients from localStorage on component mount
   useEffect(() => {
@@ -129,9 +83,9 @@ const ClientMaster = () => {
     if (storedClients) {
       setClients(JSON.parse(storedClients));
     } else {
-      // If no clients in localStorage, use initial clients and save them
-      setClients(initialClients);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialClients));
+      // Initialize with empty array if no clients exist
+      setClients([]);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
     }
   }, []);
 
@@ -140,41 +94,17 @@ const ClientMaster = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
   }, [clients]);
 
-  // Update available departments when institution changes (for new client)
-  useEffect(() => {
-    if (newClient.institution && departmentsByInstitution[newClient.institution]) {
-      setAvailableDepartments(departmentsByInstitution[newClient.institution]);
-      if (!departmentsByInstitution[newClient.institution].includes(newClient.department)) {
-        setNewClient(prev => ({ ...prev, department: "" }));
-      }
-    } else {
-      setAvailableDepartments([]);
-    }
-  }, [newClient.institution]);
-
-  // Update available departments when institution changes (for current client)
-  useEffect(() => {
-    if (currentClient?.institution && departmentsByInstitution[currentClient.institution]) {
-      setAvailableDepartments(departmentsByInstitution[currentClient.institution]);
-    }
-  }, [currentClient?.institution]);
-
   const handleAddClient = () => {
-    if (!newClient.name || !newClient.institution || !newClient.department || !newClient.phone) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+    if (!newClient.name || !newClient.institution || !newClient.department || !newClient.email || !newClient.phone) {
+      toast.error("Please fill in all required fields");
       return;
     }
     
-    const id = Math.max(0, ...clients.map(client => client.id)) + 1;
+    const id = Math.max(0, ...clients.map(client => client.id), 0) + 1;
     
     const clientToAdd = { 
       ...newClient, 
-      id,
-      createdAt: new Date().toISOString(),
+      id
     };
     
     const updatedClients = [...clients, clientToAdd];
@@ -183,17 +113,14 @@ const ClientMaster = () => {
     setNewClient({
       institution: "",
       department: "",
-      drProfile: "Doctor",
-      jobRole: "Decision Maker",
+      profile: PROFILES[0],
+      role: ROLES[0],
       name: "",
       phone: "",
       email: "",
-      message: "",
+      notes: "",
     });
-    toast({
-      title: "Success",
-      description: "Client added successfully",
-    });
+    toast.success("Client added successfully");
   };
 
   const handleUpdateClient = () => {
@@ -205,10 +132,7 @@ const ClientMaster = () => {
     
     setClients(updatedClients);
     setIsEditClientOpen(false);
-    toast({
-      title: "Success",
-      description: "Client updated successfully",
-    });
+    toast.success("Client updated successfully");
   };
 
   const handleDeleteClient = () => {
@@ -217,10 +141,7 @@ const ClientMaster = () => {
     const updatedClients = clients.filter(client => client.id !== currentClient.id);
     setClients(updatedClients);
     setIsDeleteDialogOpen(false);
-    toast({
-      title: "Success",
-      description: "Client deleted successfully",
-    });
+    toast.success("Client deleted successfully");
   };
 
   const openViewClient = (client: ClientData) => {
@@ -230,7 +151,6 @@ const ClientMaster = () => {
 
   const openEditClient = (client: ClientData) => {
     setCurrentClient(client);
-    setAvailableDepartments(departmentsByInstitution[client.institution] || []);
     setIsEditClientOpen(true);
   };
 
@@ -239,79 +159,130 @@ const ClientMaster = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
+  const handleSort = (field: keyof ClientData) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
   };
+
+  const getSortIcon = (field: keyof ClientData) => {
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? <SortAsc className="h-4 w-4 ml-1" /> : <SortDesc className="h-4 w-4 ml-1" />;
+  };
+
+  // Filter and sort clients based on search term and sort settings
+  const filteredClients = clients
+    .filter(client => 
+      searchTerm === "" ||
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (!sortField) return 0;
+      
+      const fieldA = a[sortField];
+      const fieldB = b[sortField];
+      
+      if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+        return sortDirection === "asc" 
+          ? fieldA.localeCompare(fieldB) 
+          : fieldB.localeCompare(fieldA);
+      }
+      
+      return 0;
+    });
 
   return (
     <div>
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Client Management</h1>
+        <h1 className="text-3xl font-bold">Client Master</h1>
         <p className="text-gray-500">
-          Add and manage your clients. Track client information for quotations and follow-ups.
+          Manage your client database. Add, edit, view or remove client records.
         </p>
       </div>
 
       <div className="mt-8 bg-white rounded-lg shadow">
         <div className="p-6 flex justify-between items-center border-b">
-          <h2 className="text-xl font-semibold">Client Master</h2>
-          <Button className="flex items-center gap-2" onClick={() => setIsAddClientOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Add Client
-          </Button>
+          <h2 className="text-xl font-semibold">Client Database</h2>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                placeholder="Search clients..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 w-[250px]" 
+              />
+            </div>
+            <Button className="flex items-center gap-2" onClick={() => setIsAddClientOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Add Client
+            </Button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Institution</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Profile</TableHead>
-                <TableHead>Job Role</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Added On</TableHead>
+                <TableHead className="w-[50px]">S.No.</TableHead>
+                <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Name {getSortIcon('name')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('institution')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Institution {getSortIcon('institution')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('department')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Department {getSortIcon('department')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('profile')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Profile {getSortIcon('profile')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('role')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Role {getSortIcon('role')}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('email')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Email {getSortIcon('email')}
+                  </div>
+                </TableHead>
                 <TableHead className="w-[60px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clients.length === 0 ? (
+              {filteredClients.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-6">
-                    No clients found. Add a client to get started.
+                  <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                    No clients found. Add your first client using the button above.
                   </TableCell>
                 </TableRow>
               ) : (
-                clients.map((client) => (
+                filteredClients.map((client, index) => (
                   <TableRow key={client.id}>
+                    <TableCell>{index + 1}</TableCell>
                     <TableCell>
                       <div className="font-medium">{client.name}</div>
-                      <div className="text-xs text-gray-500">{client.email}</div>
                     </TableCell>
                     <TableCell>{client.institution}</TableCell>
                     <TableCell>{client.department}</TableCell>
-                    <TableCell>{client.drProfile}</TableCell>
-                    <TableCell>
-                      <div className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        client.jobRole === 'Decision Maker' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : client.jobRole === 'Director'
-                          ? 'bg-red-100 text-red-800'
-                          : client.jobRole === 'Influencer'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {client.jobRole}
-                      </div>
-                    </TableCell>
-                    <TableCell>{client.phone}</TableCell>
-                    <TableCell>{formatDate(client.createdAt)}</TableCell>
+                    <TableCell>{client.profile}</TableCell>
+                    <TableCell>{client.role}</TableCell>
+                    <TableCell>{client.email}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -350,7 +321,7 @@ const ClientMaster = () => {
 
       {/* Add Client Dialog */}
       <Dialog open={isAddClientOpen} onOpenChange={setIsAddClientOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Add New Client</DialogTitle>
             <DialogDescription>
@@ -358,72 +329,59 @@ const ClientMaster = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="institution">Institution*</Label>
-              <Select
-                value={newClient.institution}
-                onValueChange={(value) => setNewClient({...newClient, institution: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select institution" />
-                </SelectTrigger>
-                <SelectContent>
-                  {institutions.map((institution) => (
-                    <SelectItem key={institution} value={institution}>{institution}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="institution">Institution*</Label>
+                <Input 
+                  id="institution" 
+                  value={newClient.institution} 
+                  onChange={(e) => setNewClient({...newClient, institution: e.target.value})}
+                  placeholder="Client's institution"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="department">Department*</Label>
+                <Input 
+                  id="department" 
+                  value={newClient.department} 
+                  onChange={(e) => setNewClient({...newClient, department: e.target.value})}
+                  placeholder="Client's department"
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="department">Department*</Label>
-              <Select
-                value={newClient.department}
-                onValueChange={(value) => setNewClient({...newClient, department: value})}
-                disabled={!newClient.institution}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={!newClient.institution ? "Select institution first" : "Select department"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableDepartments.map((department) => (
-                    <SelectItem key={department} value={department}>{department}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="drProfile">Dr Profile*</Label>
-              <Select
-                value={newClient.drProfile}
-                onValueChange={(value: typeof drProfileOptions[number]) => 
-                  setNewClient({...newClient, drProfile: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select profile" />
-                </SelectTrigger>
-                <SelectContent>
-                  {drProfileOptions.map((profile) => (
-                    <SelectItem key={profile} value={profile}>{profile}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="jobRole">Job Role*</Label>
-              <Select
-                value={newClient.jobRole}
-                onValueChange={(value: typeof jobRoleOptions[number]) => 
-                  setNewClient({...newClient, jobRole: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select job role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {jobRoleOptions.map((role) => (
-                    <SelectItem key={role} value={role}>{role}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="profile">Dr Profile*</Label>
+                <Select 
+                  value={newClient.profile}
+                  onValueChange={(value) => setNewClient({...newClient, profile: value})}
+                >
+                  <SelectTrigger id="profile">
+                    <SelectValue placeholder="Select profile" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROFILES.map(profile => (
+                      <SelectItem key={profile} value={profile}>{profile}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="role">Job Role*</Label>
+                <Select 
+                  value={newClient.role}
+                  onValueChange={(value) => setNewClient({...newClient, role: value})}
+                >
+                  <SelectTrigger id="role">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map(role => (
+                      <SelectItem key={role} value={role}>{role}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="name">Client Name*</Label>
@@ -431,32 +389,38 @@ const ClientMaster = () => {
                 id="name" 
                 value={newClient.name} 
                 onChange={(e) => setNewClient({...newClient, name: e.target.value})}
+                placeholder="Full name of the client"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone*</Label>
-              <Input 
-                id="phone" 
-                value={newClient.phone} 
-                onChange={(e) => setNewClient({...newClient, phone: e.target.value})}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number*</Label>
+                <Input 
+                  id="phone" 
+                  value={newClient.phone} 
+                  onChange={(e) => setNewClient({...newClient, phone: e.target.value})}
+                  placeholder="Contact number"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email Address*</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={newClient.email} 
+                  onChange={(e) => setNewClient({...newClient, email: e.target.value})}
+                  placeholder="Email address"
+                />
+              </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email"
-                value={newClient.email} 
-                onChange={(e) => setNewClient({...newClient, email: e.target.value})}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="message">Message / Notes</Label>
+              <Label htmlFor="notes">Additional Notes</Label>
               <Textarea 
-                id="message" 
-                value={newClient.message} 
-                onChange={(e) => setNewClient({...newClient, message: e.target.value})}
-                placeholder="Add any additional notes or details about this client"
+                id="notes" 
+                value={newClient.notes} 
+                onChange={(e) => setNewClient({...newClient, notes: e.target.value})}
+                placeholder="Any additional information or notes about the client"
+                className="min-h-[100px]"
               />
             </div>
           </div>
@@ -469,7 +433,7 @@ const ClientMaster = () => {
 
       {/* View Client Dialog */}
       <Dialog open={isViewClientOpen} onOpenChange={setIsViewClientOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Client Details</DialogTitle>
             <DialogDescription>
@@ -489,27 +453,20 @@ const ClientMaster = () => {
                 <span>{currentClient.department}</span>
                 
                 <span className="font-medium">Profile:</span>
-                <span>{currentClient.drProfile}</span>
+                <span>{currentClient.profile}</span>
                 
-                <span className="font-medium">Job Role:</span>
-                <span>{currentClient.jobRole}</span>
+                <span className="font-medium">Role:</span>
+                <span>{currentClient.role}</span>
                 
                 <span className="font-medium">Phone:</span>
                 <span>{currentClient.phone}</span>
                 
                 <span className="font-medium">Email:</span>
-                <span>{currentClient.email || '-'}</span>
+                <span>{currentClient.email}</span>
                 
-                <span className="font-medium">Added On:</span>
-                <span>{formatDate(currentClient.createdAt)}</span>
+                <span className="font-medium">Notes:</span>
+                <div className="whitespace-pre-wrap break-words">{currentClient.notes}</div>
               </div>
-              
-              {currentClient.message && (
-                <div>
-                  <h4 className="font-medium mb-1">Notes:</h4>
-                  <p className="text-sm bg-gray-50 p-3 rounded-md">{currentClient.message}</p>
-                </div>
-              )}
             </div>
           )}
           <DialogFooter>
@@ -520,7 +477,7 @@ const ClientMaster = () => {
 
       {/* Edit Client Dialog */}
       <Dialog open={isEditClientOpen} onOpenChange={setIsEditClientOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Edit Client</DialogTitle>
             <DialogDescription>
@@ -529,71 +486,57 @@ const ClientMaster = () => {
           </DialogHeader>
           {currentClient && (
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="edit-institution">Institution</Label>
-                <Select
-                  value={currentClient.institution}
-                  onValueChange={(value) => setCurrentClient({...currentClient, institution: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select institution" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {institutions.map((institution) => (
-                      <SelectItem key={institution} value={institution}>{institution}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-institution">Institution</Label>
+                  <Input 
+                    id="edit-institution" 
+                    value={currentClient.institution} 
+                    onChange={(e) => setCurrentClient({...currentClient, institution: e.target.value})}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-department">Department</Label>
+                  <Input 
+                    id="edit-department" 
+                    value={currentClient.department} 
+                    onChange={(e) => setCurrentClient({...currentClient, department: e.target.value})}
+                  />
+                </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-department">Department</Label>
-                <Select
-                  value={currentClient.department}
-                  onValueChange={(value) => setCurrentClient({...currentClient, department: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableDepartments.map((department) => (
-                      <SelectItem key={department} value={department}>{department}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-drProfile">Dr Profile</Label>
-                <Select
-                  value={currentClient.drProfile}
-                  onValueChange={(value: typeof drProfileOptions[number]) => 
-                    setCurrentClient({...currentClient, drProfile: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select profile" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {drProfileOptions.map((profile) => (
-                      <SelectItem key={profile} value={profile}>{profile}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-jobRole">Job Role</Label>
-                <Select
-                  value={currentClient.jobRole}
-                  onValueChange={(value: typeof jobRoleOptions[number]) => 
-                    setCurrentClient({...currentClient, jobRole: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select job role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jobRoleOptions.map((role) => (
-                      <SelectItem key={role} value={role}>{role}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-profile">Dr Profile</Label>
+                  <Select 
+                    value={currentClient.profile}
+                    onValueChange={(value) => setCurrentClient({...currentClient, profile: value})}
+                  >
+                    <SelectTrigger id="edit-profile">
+                      <SelectValue placeholder="Select profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROFILES.map(profile => (
+                        <SelectItem key={profile} value={profile}>{profile}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-role">Job Role</Label>
+                  <Select 
+                    value={currentClient.role}
+                    onValueChange={(value) => setCurrentClient({...currentClient, role: value})}
+                  >
+                    <SelectTrigger id="edit-role">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLES.map(role => (
+                        <SelectItem key={role} value={role}>{role}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-name">Client Name</Label>
@@ -603,29 +546,32 @@ const ClientMaster = () => {
                   onChange={(e) => setCurrentClient({...currentClient, name: e.target.value})}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-phone">Phone</Label>
-                <Input 
-                  id="edit-phone" 
-                  value={currentClient.phone} 
-                  onChange={(e) => setCurrentClient({...currentClient, phone: e.target.value})}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-phone">Phone Number</Label>
+                  <Input 
+                    id="edit-phone" 
+                    value={currentClient.phone} 
+                    onChange={(e) => setCurrentClient({...currentClient, phone: e.target.value})}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-email">Email Address</Label>
+                  <Input 
+                    id="edit-email" 
+                    type="email" 
+                    value={currentClient.email} 
+                    onChange={(e) => setCurrentClient({...currentClient, email: e.target.value})}
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-email">Email</Label>
-                <Input 
-                  id="edit-email" 
-                  type="email"
-                  value={currentClient.email} 
-                  onChange={(e) => setCurrentClient({...currentClient, email: e.target.value})}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-message">Message / Notes</Label>
+                <Label htmlFor="edit-notes">Additional Notes</Label>
                 <Textarea 
-                  id="edit-message" 
-                  value={currentClient.message} 
-                  onChange={(e) => setCurrentClient({...currentClient, message: e.target.value})}
+                  id="edit-notes" 
+                  value={currentClient.notes} 
+                  onChange={(e) => setCurrentClient({...currentClient, notes: e.target.value})}
+                  className="min-h-[100px]"
                 />
               </div>
             </div>
