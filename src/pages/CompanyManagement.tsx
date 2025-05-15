@@ -36,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CompanyData {
   id: number;
@@ -80,6 +81,7 @@ const CompanyManagement = () => {
   const [isEditCompanyOpen, setIsEditCompanyOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentCompany, setCurrentCompany] = useState<CompanyData | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "client" | "manufacturer">("all");
   const [newCompany, setNewCompany] = useState<Omit<CompanyData, "id">>({
     name: "",
     type: "client",
@@ -171,6 +173,11 @@ const CompanyManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  // Filter companies based on active tab
+  const filteredCompanies = activeTab === "all" 
+    ? companies 
+    : companies.filter(company => company.type === activeTab);
+
   return (
     <div>
       <div className="space-y-2">
@@ -189,6 +196,16 @@ const CompanyManagement = () => {
           </Button>
         </div>
 
+        <div className="px-6 pt-4">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "all" | "client" | "manufacturer")}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="all">All Companies</TabsTrigger>
+              <TabsTrigger value="client">Client Companies</TabsTrigger>
+              <TabsTrigger value="manufacturer">Manufacturer Companies</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -203,54 +220,62 @@ const CompanyManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {companies.map((company) => (
-                <TableRow key={company.id}>
-                  <TableCell>
-                    <div className="font-medium">{company.name}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      company.type === 'client' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {company.type === 'client' ? 'Client' : 'Manufacturer'}
-                    </div>
-                  </TableCell>
-                  <TableCell>{company.contactPerson}</TableCell>
-                  <TableCell>{company.phone}</TableCell>
-                  <TableCell>{company.email}</TableCell>
-                  <TableCell>{company.gstNumber}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="text-gray-400 hover:text-gray-600">
-                          <MoreVertical size={16} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => openViewCompany(company)} className="cursor-pointer">
-                          <Eye className="mr-2 h-4 w-4" />
-                          <span>View Details</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => openEditCompany(company)} className="cursor-pointer">
-                          <Edit className="mr-2 h-4 w-4" />
-                          <span>Edit</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => openDeleteDialog(company)} 
-                          className="cursor-pointer text-red-600 focus:text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          <span>Delete</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+              {filteredCompanies.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-6">
+                    No companies found. Add a company to get started.
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredCompanies.map((company) => (
+                  <TableRow key={company.id}>
+                    <TableCell>
+                      <div className="font-medium">{company.name}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        company.type === 'client' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {company.type === 'client' ? 'Client' : 'Manufacturer'}
+                      </div>
+                    </TableCell>
+                    <TableCell>{company.contactPerson}</TableCell>
+                    <TableCell>{company.phone}</TableCell>
+                    <TableCell>{company.email}</TableCell>
+                    <TableCell>{company.gstNumber}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="text-gray-400 hover:text-gray-600">
+                            <MoreVertical size={16} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => openViewCompany(company)} className="cursor-pointer">
+                            <Eye className="mr-2 h-4 w-4" />
+                            <span>View Details</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEditCompany(company)} className="cursor-pointer">
+                            <Edit className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => openDeleteDialog(company)} 
+                            className="cursor-pointer text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

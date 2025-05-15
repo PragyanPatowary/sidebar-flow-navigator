@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import ProductManagement from "./pages/ProductManagement";
 import CompanyManagement from "./pages/CompanyManagement";
 import EmployeeManagement from "./pages/EmployeeManagement";
+import ClientMaster from "./pages/ClientMaster";
+import QuotationMaster from "./pages/QuotationMaster";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,16 @@ const App = () => (
           <Route path="/employees" element={
             <AppLayout>
               <EmployeeManagement />
+            </AppLayout>
+          } />
+          <Route path="/clients" element={
+            <AppLayout>
+              <ClientMaster />
+            </AppLayout>
+          } />
+          <Route path="/quotations" element={
+            <AppLayout>
+              <QuotationMaster />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
