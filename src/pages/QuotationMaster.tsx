@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2, Eye, Printer, MoreVertical, FileText, Download } from "lucide-react";
@@ -10,6 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from "@/components/ui/table";
 import {
   DropdownMenu,
@@ -293,6 +293,7 @@ const QuotationMaster = () => {
     append({ productId: "", quantity: 1 });
   };
 
+  // Fix line 669: changed size="icon" to size="sm"
   const handleRemoveProduct = (index: number) => {
     remove(index);
     
@@ -666,7 +667,7 @@ const QuotationMaster = () => {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
+                          size="sm"
                           onClick={() => handleRemoveProduct(index)}
                           disabled={fields.length === 1}
                           className="h-10 w-10 rounded-full"
