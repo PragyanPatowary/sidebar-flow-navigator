@@ -37,7 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type EmployeeRole = 'admin' | 'sub-admin' | 'employee' | 'engineer' | 'salesperson';
+type EmployeeRole =    'employee' | 'engineer' | 'salesperson';
 
 interface EmployeeData {
   id: number;
@@ -56,7 +56,7 @@ const initialEmployees: EmployeeData[] = [
     name: "Amit Sharma",
     email: "amit.sharma@dritu.com",
     phone: "9876543210",
-    role: "admin",
+    role: "employee",
     joiningDate: "2023-04-10",
     status: "active",
     department: "Management",
@@ -176,8 +176,6 @@ const EmployeeManagement = () => {
   // Function to get role label
   const getRoleLabel = (role: EmployeeRole) => {
     const roleLabels = {
-      'admin': 'Admin',
-      'sub-admin': 'Sub-Admin',
       'employee': 'Employee',
       'engineer': 'Engineer',
       'salesperson': 'Salesperson',
@@ -188,10 +186,6 @@ const EmployeeManagement = () => {
   // Function to get role badge style
   const getRoleBadgeClass = (role: EmployeeRole) => {
     switch(role) {
-      case 'admin':
-        return 'bg-purple-100 text-purple-800';
-      case 'sub-admin':
-        return 'bg-indigo-100 text-indigo-800';
       case 'employee':
         return 'bg-blue-100 text-blue-800';
       case 'engineer':
@@ -335,8 +329,6 @@ const EmployeeManagement = () => {
                   <SelectValue placeholder="Select employee role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="sub-admin">Sub-Admin</SelectItem>
                   <SelectItem value="employee">Employee</SelectItem>
                   <SelectItem value="engineer">Engineer</SelectItem>
                   <SelectItem value="salesperson">Salesperson</SelectItem>
@@ -480,8 +472,6 @@ const EmployeeManagement = () => {
                     <SelectValue placeholder="Select employee role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="sub-admin">Sub-Admin</SelectItem>
                     <SelectItem value="employee">Employee</SelectItem>
                     <SelectItem value="engineer">Engineer</SelectItem>
                     <SelectItem value="salesperson">Salesperson</SelectItem>
