@@ -104,6 +104,20 @@ interface ProductOption {
   totalPrice: number;
 }
 
+type Client = { 
+  id:number;
+  name: string;
+  institution: string;
+}
+
+const clients: Client[] = [
+  { id: 1, name: 'Alice Johnson', institution: 'Acme Corp' },
+  { id: 2, name: 'Bob Smith', institution: 'Globex Inc' },
+  { id: 3, name: 'Charlie Brown', institution: 'Umbrella Ltd' },
+  { id: 4, name: 'Diana Prince', institution: 'Wayne Enterprises' },
+  { id: 5, name: 'Eve Adams', institution: 'Initech' },
+];
+
 // Initial data
 const initialQuotations: QuotationData[] = [
   {
@@ -141,6 +155,8 @@ const initialQuotations: QuotationData[] = [
   },
 ];
 
+
+
 // Default terms and conditions
 const defaultTermsConditions = {
   validity: "30 days from the date of quotation",
@@ -150,13 +166,13 @@ const defaultTermsConditions = {
 };
 
 const STORAGE_KEY = "dritu-enterprise-quotations";
-const CLIENTS_STORAGE_KEY = "dritu-enterprise-clients";
+// const CLIENTS_STORAGE_KEY = "dritu-enterprise-clients";
 const PRODUCTS_STORAGE_KEY = "dritu-enterprise-products";
 
-const QuotationMaster = () => {
+const Quotation = () => {
   const { toast } = useToast();
   const [quotations, setQuotations] = useState<QuotationData[]>([]);
-  const [clients, setClients] = useState<ClientOption[]>([]);
+  // const [clients, setClients] = useState<ClientOption[]>([]);
   const [products, setProducts] = useState<ProductOption[]>([]);
   
   const [isAddQuotationOpen, setIsAddQuotationOpen] = useState(false);
@@ -200,17 +216,17 @@ const QuotationMaster = () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialQuotations));
     }
 
-    // Load clients
-    const storedClients = localStorage.getItem(CLIENTS_STORAGE_KEY);
-    if (storedClients) {
-      const parsedClients = JSON.parse(storedClients);
-      setClients(parsedClients.map((client: any) => ({
-        id: client.id,
-        name: client.name,
-        institution: client.institution,
-        department: client.department
-      })));
-    }
+    // // Load clients
+    // const storedClients = localStorage.getItem(CLIENTS_STORAGE_KEY);
+    // if (storedClients) {
+    //   const parsedClients = JSON.parse(storedClients);
+    //   setClients(parsedClients.map((client: any) => ({
+    //     id: client.id,
+    //     name: client.name,
+    //     institution: client.institution,
+    //     department: client.department
+    //   })));
+    // }
 
     // Load products
     const storedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
@@ -458,7 +474,7 @@ const QuotationMaster = () => {
 
       <div className="mt-8 bg-white rounded-lg shadow">
         <div className="p-6 flex justify-between items-center border-b">
-          <h2 className="text-xl font-semibold">Quotation Master</h2>
+          <h2 className="text-xl font-semibold">Quotation</h2>
           <Button className="flex items-center gap-2" onClick={() => setIsAddQuotationOpen(true)}>
             <Plus className="h-4 w-4" />
             Create Quotation
@@ -1165,4 +1181,4 @@ const QuotationMaster = () => {
   );
 };
 
-export default QuotationMaster;
+export default Quotation;

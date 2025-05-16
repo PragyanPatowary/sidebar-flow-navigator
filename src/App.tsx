@@ -10,7 +10,7 @@ import ProductManagement from "./pages/ProductManagement";
 import CompanyManagement from "./pages/CompanyManagement";
 import EmployeeManagement from "./pages/EmployeeManagement";
 import ClientMaster from "./pages/ClientMaster";
-import QuotationMaster from "./pages/QuotationMaster";
+import Quotation from "./pages/Quotation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,7 +49,7 @@ const App = () => (
           } />
           <Route path="/quotations" element={
             <AppLayout>
-              <QuotationMaster />
+              <Quotation />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

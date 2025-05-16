@@ -71,8 +71,8 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         <NavItem to="/products" icon={Box} label="Products" isOpen={isOpen} />
         <NavItem to="/companies" icon={Building} label="Companies" isOpen={isOpen} />
         <NavItem to="/employees" icon={Users} label="Employees" isOpen={isOpen} />
-        <NavItem to="/clients" icon={FileText} label="Client Master" isOpen={isOpen} />
-        <NavItem to="/quotations" icon={Scroll} label="Quotation Master" isOpen={isOpen} />
+        <NavItem to="/clients" icon={FileText} label="Client" isOpen={isOpen} />
+        <NavItem to="/quotations" icon={Scroll} label="Quotation" isOpen={isOpen} />
       </nav>
     </div>
   );

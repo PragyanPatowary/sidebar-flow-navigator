@@ -200,7 +200,7 @@ const ClientMaster = () => {
   return (
     <div>
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Client Master</h1>
+        <h1 className="text-3xl font-bold">Client</h1>
         <p className="text-gray-500">
           Manage your client database. Add, edit, view or remove client records.
         </p>
