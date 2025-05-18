@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+
 import { Button } from "@/components/ui/button";
+
 import { Plus, Edit, Trash2, Eye, Printer, MoreVertical, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
+
 import {
   Table,
   TableBody,
@@ -11,6 +14,7 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import {
   Dialog,
   DialogContent,
@@ -27,9 +32,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
+
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   Select,
   SelectContent,
@@ -37,10 +46,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Card, CardContent } from "@/components/ui/card";
+
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+
 import { useToast } from "@/hooks/use-toast";
+
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+
 import { 
   Form, 
   FormControl, 
@@ -176,12 +190,17 @@ const Quotation = () => {
   const [products, setProducts] = useState<ProductOption[]>([]);
   
   const [isAddQuotationOpen, setIsAddQuotationOpen] = useState(false);
+
   const [isViewQuotationOpen, setIsViewQuotationOpen] = useState(false);
+  
   const [isEditQuotationOpen, setIsEditQuotationOpen] = useState(false);
+  
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   
   const [currentQuotation, setCurrentQuotation] = useState<QuotationData | null>(null);
+  
   const [selectedProducts, setSelectedProducts] = useState<ProductItem[]>([]);
 
   const printFrameRef = useRef<HTMLIFrameElement>(null);

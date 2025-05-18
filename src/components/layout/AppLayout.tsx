@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
-import { Sidebar } from "./Sidebar";
-import { Navbar } from "./Navbar";
+import { Sidebar } from "../Sidebar";
+import { Navbar } from "../Navbar";
 
 interface AppLayoutProps {
   children: React.ReactNode;

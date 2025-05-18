@@ -26,7 +26,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           onClick={toggleSidebar}
           className="p-2 rounded-md text-gray-500 hover:bg-gray-100 md:hidden"
         >
-          <Menu size={20} />
+          <Menu size={24} />
         </button>
         
         <div className="hidden md:flex items-center ml-4 relative">
