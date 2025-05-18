@@ -11,6 +11,7 @@ import CompanyManagement from "./pages/CompanyManagement";
 import EmployeeManagement from "./pages/EmployeeManagement";
 import ClientMaster from "./pages/ClientMaster";
 import Quotation from "./pages/Quotation";
+import TenderManagement from "./pages/TenderManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,11 @@ const App = () => (
           <Route path="/quotations" element={
             <AppLayout>
               <Quotation />
+            </AppLayout>
+          } />
+          <Route path="/tenders" element={
+            <AppLayout>
+              <TenderManagement />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
