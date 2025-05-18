@@ -11,7 +11,8 @@ import CompanyManagement from "./pages/CompanyManagement";
 import EmployeeManagement from "./pages/EmployeeManagement";
 import ClientMaster from "./pages/ClientMaster";
 import Quotation from "./pages/Quotation";
-import TenderManagement from "./pages/TenderManagement";
+import AllTenders from "./pages/AllTenders";
+import ApplyTenders from "./pages/ApplyTenders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,7 +56,12 @@ const App = () => (
           } />
           <Route path="/tenders" element={
             <AppLayout>
-              <TenderManagement />
+              <AllTenders />
+            </AppLayout>
+          } />
+          <Route path="/apply-tenders" element={
+            <AppLayout>
+              <ApplyTenders />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

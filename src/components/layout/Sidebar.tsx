@@ -143,8 +143,7 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         {/* Tender Management with submenus */}
         <NavGroup icon={Award} label="Tender Management" isOpen={isOpen}>
           <SubNavItem to="/tenders" label="All Tenders" isOpen={isOpen} />
-          <SubNavItem to="/tenders?tab=apply" label="Apply for Tenders" isOpen={isOpen} />
-          <SubNavItem to="/tenders?tab=emd" label="EMD Management" isOpen={isOpen} />
+          <SubNavItem to="/apply-tenders" label="Apply for Tenders" isOpen={isOpen} />
         </NavGroup>
       </nav>
     </div>

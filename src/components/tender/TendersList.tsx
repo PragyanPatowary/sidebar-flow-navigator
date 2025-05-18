@@ -1,12 +1,8 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { 
-  Calendar, 
   Check, 
   FileText, 
-  Plus, 
   X 
 } from "lucide-react";
 import { 
@@ -16,6 +12,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import DataTable from "@/components/common/DataTable";
 
 // Sample tender data
@@ -60,8 +57,7 @@ const initialTenders = [
 
 const TendersList = () => {
   const { toast } = useToast();
-  const [tenders, setTenders] = useState(initialTenders);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [tenders] = useState(initialTenders);
 
   const columns = [
     {
@@ -157,31 +153,11 @@ const TendersList = () => {
     });
   };
 
-  // Filter tenders based on search term
-  const filteredTenders = tenders.filter(
-    tender =>
-      tender.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tender.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tender.client.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="space-y-4">
-      <div className="flex justify-between">
-        <Input
-          placeholder="Search tenders..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Tender
-        </Button>
-      </div>
-      
       <DataTable
         columns={columns}
-        data={filteredTenders}
+        data={tenders}
         searchPlaceholder="Filter tenders..."
       />
     </div>
