@@ -1,31 +1,20 @@
 
 import { Toaster } from "@/components/ui/toaster";
-
 import { Toaster as Sonner } from "@/components/ui/sonner";
-
 import { TooltipProvider } from "@/components/ui/tooltip";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import { AppLayout } from "./components/layout/AppLayout";
-
 import Index from "./pages/Index";
-
 import ProductManagement from "./pages/ProductManagement";
-
 import CompanyManagement from "./pages/CompanyManagement";
-
 import EmployeeManagement from "./pages/EmployeeManagement";
-
 import ClientMaster from "./pages/ClientMaster";
-
 import Quotation from "./pages/Quotation";
-
 import NotFound from "./pages/NotFound";
-
 import TenderManagement from "./pages/TenderManagement";
+import AllTenders from "./pages/AllTenders";
+import ApplyTenders from "./pages/ApplyTenders";
 
 const queryClient = new QueryClient();
 
@@ -71,8 +60,16 @@ const App = () => (
               <TenderManagement />
             </AppLayout>
           } />
-          
-          
+          <Route path="/all-tenders" element={
+            <AppLayout>
+              <AllTenders />
+            </AppLayout>
+          } />
+          <Route path="/apply-tenders" element={
+            <AppLayout>
+              <ApplyTenders />
+            </AppLayout>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

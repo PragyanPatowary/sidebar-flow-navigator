@@ -121,11 +121,6 @@ const TendersList = () => {
             <DropdownMenuItem onClick={() => handleUpdateStatus(row.original)}>
               Update Status
             </DropdownMenuItem>
-            {row.original.status === "Won" && (
-              <DropdownMenuItem onClick={() => handleManageDeposits(row.original)}>
-                Manage Deposits
-              </DropdownMenuItem>
-            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -146,19 +141,12 @@ const TendersList = () => {
     });
   };
 
-  const handleManageDeposits = (tender) => {
-    toast({
-      title: "Manage Deposits",
-      description: `Managing deposits for ${tender.reference}`,
-    });
-  };
-
   return (
     <div className="space-y-4">
       <DataTable
         columns={columns}
         data={tenders}
-        searchPlaceholder="Filter tenders..."
+        searchPlaceholder="Search tenders..."
       />
     </div>
   );
