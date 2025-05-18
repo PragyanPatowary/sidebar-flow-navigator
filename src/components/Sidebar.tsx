@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { 
   BarChart, 
@@ -9,7 +9,8 @@ import {
   Building,
   Users,
   FileText,
-  Scroll
+  Scroll,
+  Award
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,71 @@ const NavItem = ({ to, icon: Icon, label, isOpen }: NavItemProps) => {
       <Icon className="h-5 w-5 shrink-0" />
       {isOpen && <span className="ml-3">{label}</span>}
     </NavLink>
+  );
+};
+
+interface SubNavItemProps {
+  to: string;
+  label: string;
+  isOpen: boolean;
+}
+
+const SubNavItem = ({ to, label, isOpen }: SubNavItemProps) => {
+  if (!isOpen) return null;
+  
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        cn(
+          "flex items-center px-4 py-2 ml-7 text-sidebar-foreground hover:bg-sidebar-accent group rounded-md transition-colors text-sm",
+          isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
+        )
+      }
+    >
+      <span>{label}</span>
+    </NavLink>
+  );
+};
+
+interface NavGroupProps {
+  icon: React.ElementType;
+  label: string;
+  isOpen: boolean;
+  children?: React.ReactNode;
+}
+
+const NavGroup = ({ icon: Icon, label, isOpen, children }: NavGroupProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <div>
+      <div
+        className={cn(
+          "flex items-center justify-between px-4 py-3 text-sidebar-foreground hover:bg-sidebar-accent group rounded-md transition-colors cursor-pointer",
+          isExpanded && "bg-sidebar-accent text-sidebar-accent-foreground"
+        )}
+        onClick={toggleExpand}
+      >
+        <div className="flex items-center">
+          <Icon className="h-5 w-5 shrink-0" />
+          {isOpen && <span className="ml-3">{label}</span>}
+        </div>
+        {isOpen && (
+          <ChevronRight 
+            className={cn(
+              "h-4 w-4 transition-transform",
+              isExpanded && "transform rotate-90"
+            )} 
+          />
+        )}
+      </div>
+      {isExpanded && children}
+    </div>
   );
 };
 
@@ -73,6 +139,12 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         <NavItem to="/employees" icon={Users} label="Employees" isOpen={isOpen} />
         <NavItem to="/clients" icon={FileText} label="Client" isOpen={isOpen} />
         <NavItem to="/quotations" icon={Scroll} label="Quotation" isOpen={isOpen} />
+        
+        {/* Tender Management with submenus */}
+        <NavGroup icon={Award} label="Tender Management" isOpen={isOpen}>
+          <SubNavItem to="/tenders" label="All Tenders" isOpen={isOpen} />
+          <SubNavItem to="/apply-tenders" label="Apply for Tenders" isOpen={isOpen} />
+        </NavGroup>
       </nav>
     </div>
   );
