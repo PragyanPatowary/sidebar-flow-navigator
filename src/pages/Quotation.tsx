@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Eye, Printer, MoreVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Printer, MoreVertical, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   Table,
@@ -156,6 +155,8 @@ const initialQuotations: QuotationData[] = [
   },
 ];
 
+
+
 // Default terms and conditions
 const defaultTermsConditions = {
   validity: "30 days from the date of quotation",
@@ -165,22 +166,25 @@ const defaultTermsConditions = {
 };
 
 const STORAGE_KEY = "dritu-enterprise-quotations";
+// const CLIENTS_STORAGE_KEY = "dritu-enterprise-clients";
 const PRODUCTS_STORAGE_KEY = "dritu-enterprise-products";
 
 const Quotation = () => {
   const { toast } = useToast();
   const [quotations, setQuotations] = useState<QuotationData[]>([]);
+  // const [clients, setClients] = useState<ClientOption[]>([]);
   const [products, setProducts] = useState<ProductOption[]>([]);
   
   const [isAddQuotationOpen, setIsAddQuotationOpen] = useState(false);
   const [isViewQuotationOpen, setIsViewQuotationOpen] = useState(false);
   const [isEditQuotationOpen, setIsEditQuotationOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   
   const [currentQuotation, setCurrentQuotation] = useState<QuotationData | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<ProductItem[]>([]);
 
-  const printIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const printFrameRef = useRef<HTMLIFrameElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -211,6 +215,18 @@ const Quotation = () => {
       setQuotations(initialQuotations);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialQuotations));
     }
+
+    // // Load clients
+    // const storedClients = localStorage.getItem(CLIENTS_STORAGE_KEY);
+    // if (storedClients) {
+    //   const parsedClients = JSON.parse(storedClients);
+    //   setClients(parsedClients.map((client: any) => ({
+    //     id: client.id,
+    //     name: client.name,
+    //     institution: client.institution,
+    //     department: client.department
+    //   })));
+    // }
 
     // Load products
     const storedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
@@ -293,6 +309,7 @@ const Quotation = () => {
     append({ productId: "", quantity: 1 });
   };
 
+  // Fix line 669: changed size="icon" to size="sm"
   const handleRemoveProduct = (index: number) => {
     remove(index);
     
@@ -402,151 +419,15 @@ const Quotation = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  // Function to directly print a quotation
-  const handlePrintQuotation = (quotation: QuotationData) => {
-    // Create hidden iframe for printing
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    
-    document.body.appendChild(iframe);
-    
-    const printContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Quotation ${quotation.referenceId}</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
-          .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
-          .logo { font-size: 24px; font-weight: bold; }
-          .quotation-info { margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; }
-          th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; word-wrap: break-word; }
-          th { background-color: #f5f5f5; }
-          .description-cell { width: 35%; }
-          .text-right { text-align: right; }
-          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
-          .terms { margin-top: 20px; }
-          .terms h3 { margin-bottom: 10px; }
-          .page-break { page-break-before: always; }
-          @media print {
-            body { padding: 0; margin: 20px; }
-            table { page-break-inside: auto; }
-            tr { page-break-inside: avoid; }
-            .description-cell { max-width: 35%; overflow-wrap: break-word; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div class="logo">DRITU ENTERPRISE</div>
-          <div>
-            <h2>QUOTATION</h2>
-            <p><strong>Ref:</strong> ${quotation.referenceId}</p>
-            <p><strong>Date:</strong> ${formatDisplayDate(quotation.date)}</p>
-          </div>
-        </div>
-        
-        <div class="quotation-info">
-          <p><strong>To:</strong><br/>
-          ${quotation.clientName}<br/>
-          ${quotation.clientCompany}</p>
-          
-          <p><strong>Valid Until:</strong> ${formatDisplayDate(quotation.validUntil)}</p>
-        </div>
-        
-        <table>
-          <thead>
-            <tr>
-              <th width="25%">Product</th>
-              <th width="35%" class="description-cell">Description</th>
-              <th class="text-right" width="10%">Price (₹)</th>
-              <th class="text-right" width="8%">Qty</th>
-              <th class="text-right" width="10%">GST (₹)</th>
-              <th class="text-right" width="12%">Total (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${quotation.products.map(product => `
-              <tr>
-                <td>
-                  <strong>${product.name}</strong><br/>
-                  <small>${product.make} ${product.model}</small>
-                </td>
-                <td style="word-wrap: break-word; white-space: normal;" class="description-cell">${product.specification}</td>
-                <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.price / product.quantity)}</td>
-                <td class="text-right">${product.quantity}</td>
-                <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.gst)}</td>
-                <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.totalPrice)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="text-right"><strong>Subtotal:</strong></td>
-              <td class="text-right">${new Intl.NumberFormat('en-IN').format(quotation.subtotal)}</td>
-            </tr>
-            <tr>
-              <td colspan="4"></td>
-              <td class="text-right"><strong>GST:</strong></td>
-              <td class="text-right">${new Intl.NumberFormat('en-IN').format(quotation.gstTotal)}</td>
-            </tr>
-            <tr>
-              <td colspan="4"></td>
-              <td class="text-right"><strong>Grand Total:</strong></td>
-              <td class="text-right"><strong>${new Intl.NumberFormat('en-IN').format(quotation.grandTotal)}</strong></td>
-            </tr>
-          </tfoot>
-        </table>
-        
-        <div class="page-break"></div>
-        
-        <div class="terms">
-          <h3>Terms & Conditions</h3>
-          <p><strong>1. Validity:</strong> ${quotation.termsConditions.validity}</p>
-          <p><strong>2. Delivery Time:</strong> ${quotation.termsConditions.deliveryTime}</p>
-          <p><strong>3. Warranty:</strong> ${quotation.termsConditions.warranty}</p>
-          <p><strong>4. Payment Terms:</strong> ${quotation.termsConditions.paymentTerms}</p>
-          <p><strong>5. Taxes:</strong> All prices are inclusive of applicable GST.</p>
-          <p><strong>6. Installation:</strong> Installation charges are included in the price unless specified otherwise.</p>
-          <p><strong>7. Shipping:</strong> Shipping charges are extra and will be charged as per actuals.</p>
-          <p><strong>8. Cancellation:</strong> Orders once placed cannot be cancelled without proper written consent from Dritu Enterprise.</p>
-        </div>
-        
-        <div class="footer">
-          <p>Thank you for your business!</p>
-          <p><strong>DRITU ENTERPRISE</strong><br/>
-          123 Business Park, Mumbai - 400001<br/>
-          Phone: +91 9876543210<br/>
-          Email: info@dritu.com</p>
-        </div>
-      </body>
-      </html>
-    `;
-    
-    // Wait for iframe to load before printing
-    iframe.onload = () => {
-      if (iframe.contentWindow) {
-        iframe.contentWindow.document.open();
-        iframe.contentWindow.document.write(printContent);
-        iframe.contentWindow.document.close();
-        
-        setTimeout(() => {
-          iframe.contentWindow?.print();
-          
-          // Remove the iframe after printing (or after a timeout)
-          setTimeout(() => {
-            document.body.removeChild(iframe);
-          }, 1000);
-        }, 500);
-      }
-    };
+  const openPrintPreview = (quotation: QuotationData) => {
+    setCurrentQuotation(quotation);
+    setIsPrintPreviewOpen(true);
+  };
+
+  const handlePrint = () => {
+    if (printFrameRef.current && printFrameRef.current.contentWindow) {
+      printFrameRef.current.contentWindow.print();
+    }
   };
 
   // Format currency to Indian Rupees format
@@ -651,9 +532,9 @@ const Quotation = () => {
                             <Eye className="mr-2 h-4 w-4" />
                             <span>View Details</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handlePrintQuotation(quotation)} className="cursor-pointer">
+                          <DropdownMenuItem onClick={() => openPrintPreview(quotation)} className="cursor-pointer">
                             <Printer className="mr-2 h-4 w-4" />
-                            <span>Print</span>
+                            <span>Print Preview</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => openEditQuotation(quotation)} className="cursor-pointer">
                             <Edit className="mr-2 h-4 w-4" />
@@ -679,7 +560,7 @@ const Quotation = () => {
 
       {/* Add Quotation Dialog */}
       <Dialog open={isAddQuotationOpen} onOpenChange={setIsAddQuotationOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Create New Quotation</DialogTitle>
             <DialogDescription>
@@ -1020,19 +901,162 @@ const Quotation = () => {
             <Button 
               variant="outline" 
               className="flex items-center gap-2" 
-              onClick={() => currentQuotation && handlePrintQuotation(currentQuotation)}
+              onClick={() => openPrintPreview(currentQuotation!)}
             >
               <Printer className="h-4 w-4" />
-              Print
+              Print Preview
             </Button>
             <Button onClick={() => setIsViewQuotationOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Print Preview Dialog */}
+      <Dialog open={isPrintPreviewOpen} onOpenChange={setIsPrintPreviewOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Print Preview</DialogTitle>
+            <DialogDescription>
+              Preview and print the quotation.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {currentQuotation && (
+            <div className="relative">
+              <div className="bg-white border rounded-md overflow-hidden h-[60vh]">
+                <iframe
+                  ref={printFrameRef}
+                  title="print-preview"
+                  className="w-full h-full"
+                  srcDoc={`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <title>Quotation ${currentQuotation.referenceId}</title>
+                      <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+                        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                        .logo { font-size: 24px; font-weight: bold; }
+                        .quotation-info { margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; }
+                        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; word-wrap: break-word; }
+                        th { background-color: #f5f5f5; }
+                        .description-cell { width: 35%; }
+                        .text-right { text-align: right; }
+                        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
+                        .terms { margin-top: 20px; }
+                        .terms h3 { margin-bottom: 10px; }
+                        .page-break { page-break-before: always; }
+                        @media print {
+                          body { padding: 0; margin: 20px; }
+                        }
+                      </style>
+                    </head>
+                    <body>
+                      <div class="header">
+                        <div class="logo">DRITU ENTERPRISE</div>
+                        <div>
+                          <h2>QUOTATION</h2>
+                          <p><strong>Ref:</strong> ${currentQuotation.referenceId}</p>
+                          <p><strong>Date:</strong> ${formatDisplayDate(currentQuotation.date)}</p>
+                        </div>
+                      </div>
+                      
+                      <div class="quotation-info">
+                        <p><strong>To:</strong><br/>
+                        ${currentQuotation.clientName}<br/>
+                        ${currentQuotation.clientCompany}</p>
+                        
+                        <p><strong>Valid Until:</strong> ${formatDisplayDate(currentQuotation.validUntil)}</p>
+                      </div>
+                      
+                      <table>
+                        <thead>
+                          <tr>
+                            <th width="25%">Product</th>
+                            <th width="35%" class="description-cell">Description</th>
+                            <th class="text-right" width="10%">Price (₹)</th>
+                            <th class="text-right" width="8%">Qty</th>
+                            <th class="text-right" width="10%">GST (₹)</th>
+                            <th class="text-right" width="12%">Total (₹)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${currentQuotation.products.map(product => `
+                            <tr>
+                              <td>
+                                <strong>${product.name}</strong><br/>
+                                <small>${product.make} ${product.model}</small>
+                              </td>
+                              <td style="word-wrap: break-word; white-space: normal;">${product.specification}</td>
+                              <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.price / product.quantity)}</td>
+                              <td class="text-right">${product.quantity}</td>
+                              <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.gst)}</td>
+                              <td class="text-right">${new Intl.NumberFormat('en-IN').format(product.totalPrice)}</td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="4"></td>
+                            <td class="text-right"><strong>Subtotal:</strong></td>
+                            <td class="text-right">${new Intl.NumberFormat('en-IN').format(currentQuotation.subtotal)}</td>
+                          </tr>
+                          <tr>
+                            <td colspan="4"></td>
+                            <td class="text-right"><strong>GST:</strong></td>
+                            <td class="text-right">${new Intl.NumberFormat('en-IN').format(currentQuotation.gstTotal)}</td>
+                          </tr>
+                          <tr>
+                            <td colspan="4"></td>
+                            <td class="text-right"><strong>Grand Total:</strong></td>
+                            <td class="text-right"><strong>${new Intl.NumberFormat('en-IN').format(currentQuotation.grandTotal)}</strong></td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                      
+                      <div class="page-break"></div>
+                      
+                      <div class="terms">
+                        <h3>Terms & Conditions</h3>
+                        <p><strong>1. Validity:</strong> ${currentQuotation.termsConditions.validity}</p>
+                        <p><strong>2. Delivery Time:</strong> ${currentQuotation.termsConditions.deliveryTime}</p>
+                        <p><strong>3. Warranty:</strong> ${currentQuotation.termsConditions.warranty}</p>
+                        <p><strong>4. Payment Terms:</strong> ${currentQuotation.termsConditions.paymentTerms}</p>
+                        <p><strong>5. Taxes:</strong> All prices are inclusive of applicable GST.</p>
+                        <p><strong>6. Installation:</strong> Installation charges are included in the price unless specified otherwise.</p>
+                        <p><strong>7. Shipping:</strong> Shipping charges are extra and will be charged as per actuals.</p>
+                        <p><strong>8. Cancellation:</strong> Orders once placed cannot be cancelled without proper written consent from Dritu Enterprise.</p>
+                      </div>
+                      
+                      <div class="footer">
+                        <p>Thank you for your business!</p>
+                        <p><strong>DRITU ENTERPRISE</strong><br/>
+                        123 Business Park, Mumbai - 400001<br/>
+                        Phone: +91 9876543210<br/>
+                        Email: info@dritu.com</p>
+                      </div>
+                    </body>
+                    </html>
+                  `}
+                />
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setIsPrintPreviewOpen(false)}>Close</Button>
+            <Button className="flex items-center gap-2" onClick={handlePrint}>
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Quotation Dialog */}
       <Dialog open={isEditQuotationOpen} onOpenChange={setIsEditQuotationOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Quotation Status</DialogTitle>
             <DialogDescription>
@@ -1135,7 +1159,7 @@ const Quotation = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Quotation</DialogTitle>
             <DialogDescription>
@@ -1153,9 +1177,6 @@ const Quotation = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
-      {/* Hidden iframe for direct printing */}
-      <iframe ref={printIframeRef} className="hidden" />
     </div>
   );
 };
