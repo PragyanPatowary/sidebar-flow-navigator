@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import TenderManagement from "./pages/TenderManagement";
 import AllTenders from "./pages/AllTenders";
 import ApplyTenders from "./pages/ApplyTenders";
+import ServiceMaster from "./pages/ServiceMaster";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,11 @@ const App = () => (
           <Route path="/clients" element={
             <AppLayout>
               <ClientMaster />
+            </AppLayout>
+          } />
+          <Route path="/services" element={
+            <AppLayout>
+              <ServiceMaster />
             </AppLayout>
           } />
           <Route path="/quotations" element={

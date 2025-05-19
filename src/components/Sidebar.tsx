@@ -12,7 +12,8 @@ import {
   Scroll,
   Award,
   ListCheck,
-  FilePlus
+  FilePlus,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -140,6 +141,7 @@ export const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         <NavItem to="/companies" icon={Building} label="Companies" isOpen={isOpen} />
         <NavItem to="/employees" icon={Users} label="Employees" isOpen={isOpen} />
         <NavItem to="/clients" icon={FileText} label="Client" isOpen={isOpen} />
+        <NavItem to="/services" icon={Settings} label="Services" isOpen={isOpen} />
         <NavItem to="/quotations" icon={Scroll} label="Quotation" isOpen={isOpen} />
         
         {/* Tender Management with direct links */}
