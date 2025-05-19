@@ -1,15 +1,36 @@
 
 import React, { useEffect } from "react";
+
 import { useLocation, useNavigate } from "react-router-dom";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-
-
 import TendersList from "@/components/tender/TendersList";
+
 import TenderApplication from "@/components/tender/TenderApplication";
+
 import EMDManagement from "@/components/tender/EMDManagement";
 
-const TenderManagement = () => {
+const TenderManagement: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const tabFromQuery = new URLSearchParams(location.search).get("tab");
+  const [activeTab, setActiveTab] = React.useState(tabFromQuery || "tenders");
+
+  function handleTabChange(value: string): void {
+    setActiveTab(value);
+    const params = new URLSearchParams(location.search);
+    params.set("tab", value);
+    navigate({ search: params.toString() }, { replace: true });
+  }
+
+  useEffect(() => {
+    if (tabFromQuery && tabFromQuery !== activeTab) {
+      setActiveTab(tabFromQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromQuery]);
+
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">

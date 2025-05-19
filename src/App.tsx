@@ -13,7 +13,7 @@ import ClientMaster from "./pages/ClientMaster";
 import Quotation from "./pages/Quotation";
 import NotFound from "./pages/NotFound";
 import TenderManagement from "./pages/TenderManagement";
-import AllTenders from "./pages/AllTenders";
+// import AllTenders from "./pages/AllTenders";
 import ApplyTenders from "./pages/ApplyTenders";
 import ServiceMaster from "./pages/ServiceMaster";
 
@@ -66,11 +66,11 @@ const App = () => (
               <TenderManagement />
             </AppLayout>
           } />
-          <Route path="/all-tenders" element={
+          {/* <Route path="/all-tenders" element={
             <AppLayout>
               <AllTenders />
             </AppLayout>
-          } />
+          } /> */}
           <Route path="/apply-tenders" element={
             <AppLayout>
               <ApplyTenders />
