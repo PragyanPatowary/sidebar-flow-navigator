@@ -1,8 +1,8 @@
 
 import React from "react";
-import { TendersList } from "@/components/tender/TendersList";
-import { TenderApplication } from "@/components/tender/TenderApplication";
-import { EMDManagement } from "@/components/tender/EMDManagement";
+import TendersList from "@/components/tender/TendersList";
+import TenderApplication from "@/components/tender/TenderApplication";
+import EMDManagement from "@/components/tender/EMDManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
