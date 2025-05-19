@@ -1,39 +1,16 @@
 
+<<<<<<< HEAD
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+=======
+import React from "react";
+>>>>>>> e750d05b29a48ba1576b531f00e11add76c9a65b
 import TendersList from "@/components/tender/TendersList";
 import TenderApplication from "@/components/tender/TenderApplication";
 import EMDManagement from "@/components/tender/EMDManagement";
 
 const TenderManagement = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = React.useState("tenders");
-
-  // Handle query parameters for tabs
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const tab = params.get("tab");
-    
-    if (tab) {
-      setActiveTab(tab);
-    } else {
-      setActiveTab("tenders");
-    }
-  }, [location]);
-
-  // Update URL when tab changes
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    
-    if (value === "tenders") {
-      navigate("/tenders");
-    } else {
-      navigate(`/tenders?tab=${value}`);
-    }
-  };
-
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
