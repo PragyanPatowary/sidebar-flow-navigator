@@ -1,4 +1,4 @@
-import withMT from "@material-tailwind/react/utils/withMT";
+
 import type { Config } from "tailwindcss";
 
 const tailwindConfig: Config = {
@@ -96,4 +96,4 @@ const tailwindConfig: Config = {
   plugins: [require("tailwindcss-animate")],
 };
 
-export default withMT(tailwindConfig);
+export default tailwindConfig;
